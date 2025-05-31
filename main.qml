@@ -4,7 +4,7 @@ import QtQuick.Controls // For controls like buttons, labels (if needed later)
 import QtQuick.Layouts
 
 // Importing our custom QML module
-import QtAppQml 1.0
+import QtAppQml
 
 // Your C++ backend objects are exposed to the root context
 // You can access them directly by their context property names
