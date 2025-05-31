@@ -56,12 +56,8 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          # Find Qt's CMake configuration module.
-          # This path might vary slightly based on the Qt version and installation.
-          # actions-setup-qt typically adds Qt to the PATH, so find_package(Qt6 COMPONENTS Widgets) should work.
           cmake .. -DCMAKE_BUILD_TYPE=Release \
-           -DQT_INSTALL_DIR="${{ env.Q-DCMAKE_PREFIX_PATH="${{ env.QT_INSTALL_DIR }}/lib/cmake" # This might be set by actions-setup-qt, or you might need to find it
-
+                   -DCMAKE_PREFIX_PATH="${{ env.QT_INSTALL_DIR }}/lib/cmake"
       - name: Build Application
         working-directory: build
         run: cmake --build . --config Release
