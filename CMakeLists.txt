@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(MyFirstQT VERSION 0.1 LANGUAGES CXX)
+project(HexGameApp VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,51 +9,54 @@ find_package(Qt6 REQUIRED COMPONENTS
     Core
     Gui
     Widgets
+    Qml
     Quick
 )
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-qt_add_executable(qtapp
-    main.cpp
-    MainWindow.cpp
-    HexItem.cpp
-    HexBoardScene.cpp
-)
-
 # This resolves all the warnings qmllint gives
 set(QT_QML_GENERATE_QMLLS_INI ON)
 
-qt_add_qml_module(qtapp
-    URI qtapp
+qt_add_qml_module(QtAppQmlModule
+    URI QtAppQml.UI
     VERSION 1.0
     QML_FILES
         Main.qml
-    RESOURCES Bluebubble.svg
-    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/qtapp
+        Hexagon.qml
+        # UnitItem.qml 
+    RESOURCES 
+        Bluebubble.svg
+    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/QtAppQml/UI 
 )
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-set_target_properties(qtapp PROPERTIES
-#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appMyFirstQT
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+# Define the source files for your executable
+set(APP_SOURCES
+    main.cpp
+    BoardModel.cpp
+    HexCoordConverter.cpp
 )
 
-target_link_libraries(qtapp PRIVATE
+# Define the MOC-able headers. These will be processed by MOC.
+set(APP_MOC_HEADERS
+    BoardModel.h
+    HexCoordConverter.h
+)
+
+qt_add_executable(${PROJECT_NAME} ${APP_SOURCES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Quick
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
+    Qt6::Qml
+    QtAppQmlModule
 )
 
-include(GNUInstallDirs)
-install(TARGETS qtapp
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+#include(GNUInstallDirs)
+#install(TARGETS ${PROJECT_NAME}
+#    BUNDLE DESTINATION .
+#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#)
