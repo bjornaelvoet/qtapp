@@ -3,6 +3,11 @@ import QtQuick
 
 Item {
     id: hexRoot
+
+    // This helps qmllint understand the scope.
+    //property var coordConverter: Qt.application.qmlEngine.rootContext.contextProperty("coordConverter")
+    //property var boardModel: Qt.application.qmlEngine.rootContext.contextProperty("boardModel")
+
     property int hexRow: 0
     property int hexCol: 0
     property int currentHexState: 0 // Will be bound to C++ boardModel.getHexState()
@@ -20,14 +25,14 @@ Item {
     // Hexagon shape using Path
     Path {
         id: hexShape
-        anchors.centerIn: parent // Center the path within this Item
-        fillColor: {
-            if (currentHexState === BoardModel.Player1) return "#3498db" // Blue
-            if (currentHexState === BoardModel.Player2) return "#e74c3c" // Red
-            return "#cccccc" // Light gray for empty
-        }
-        strokeColor: "black"
-        strokeWidth: 2
+        //anchors.centerIn: parent // Center the path within this Item
+        //fillColor: {
+        //    if (currentHexState === BoardModel.Player1) return "#3498db" // Blue
+        //    if (currentHexState === BoardModel.Player2) return "#e74c3c" // Red
+        //    return "#cccccc" // Light gray for empty
+        //}
+        //strokeColor: "black"
+        //strokeWidth: 2
 
         // Vertices for a flat-top hexagon centered at (0,0)
         // M_PI is Math.PI in QML

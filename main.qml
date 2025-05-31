@@ -1,7 +1,10 @@
 // Main.qml
 import QtQuick
 import QtQuick.Controls // For controls like buttons, labels (if needed later)
-import Qt.labs.platform // For platform-specific features like system dialogs (if needed later)
+import QtQuick.Layouts
+
+// Importing our custom QML module
+import QtAppQml 1.0
 
 // Your C++ backend objects are exposed to the root context
 // You can access them directly by their context property names
@@ -74,7 +77,8 @@ ApplicationWindow {
                     // Animate a brief pulse on the hex when its state changes
                     ParallelAnimation {
                         NumberAnimation { target: parent; property: "scale"; from: 1.0; to: 1.1; duration: 100; easing.type: Easing.OutCubic }
-                        NumberAnimation { target: parent; property: "scale"; from: 1.1; to: 1.0; duration: 200; easing.type: Easing.InCubic; delay: 100 }
+                        //NumberAnimation { target: parent; property: "scale"; from: 1.1; to: 1.0; duration: 200; easing.type: Easing.InCubic; delay: 100 }
+                        NumberAnimation { target: parent; property: "scale"; from: 1.1; to: 1.0; duration: 200; easing.type: Easing.InCubic}
                     }
                 }
 
