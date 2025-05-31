@@ -8,23 +8,23 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-        logLevel:
-          description: 'Log level'
-          required: true
-          default: 'warning'
-          type: choice
-          options:
-          - info
-          - warning
-          - debug
-        tags:
-          description: 'Test scenario tags'
-          required: false
-          type: boolean
-        environment:
-          description: 'Environment to run tests against'
-          type: environment
-          required: true
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
 
 env:
   SOURCE_DIR:   ${{ github.workspace }}
@@ -36,44 +36,57 @@ jobs:
     runs-on: macos-15
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-            version: ${{ env.QT_VERSION }} 
-            host: 'mac'
-            target: 'desktop'
-            arch: 'clang_64'
-            tools: 'tools_cmake'
-            setup-python: false
+    - name: Set up Python with virtual environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13' # Use a specific, common Python 3 version
+        cache: 'pip' # Optional: for caching pip dependencies
+
+    - name: Install aqtinstall and its dependencies into the virtual environment
+      # The virtual environment should be active from the previous step.
+      # `pip` will now install into the venv.
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install aqtinstall
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ env.QT_VERSION }} 
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        tools: 'tools_cmake'
+        setup-python: false
     
-      - name: Create Build Directory
-        run: mkdir build
+    - name: Create Build Directory
+      run: mkdir build
 
-      - name: Configure CMake
-        shell: bash
-        working-directory: build
-        run: |
-          cmake .. -DCMAKE_BUILD_TYPE=Release \
-                   -DCMAKE_PREFIX_PATH="${{ env.QT_INSTALL_DIR }}/lib/cmake"
-      - name: Build Application
-        working-directory: build
-        run: cmake --build . --config Release
+    - name: Configure CMake
+      shell: bash
+      working-directory: build
+      run: |
+        cmake .. -DCMAKE_BUILD_TYPE=Release \
+                  -DCMAKE_PREFIX_PATH="${{ env.QT_INSTALL_DIR }}/lib/cmake"
+    - name: Build Application
+      working-directory: build
+      run: cmake --build . --config Release
 
-      - name: Package Application (Optional)
-        working-directory: build
-        run: |
-          # If your CMake project generates a .app bundle, you can find it here.
-          # For example, if your target is named 'YourApp'
-          # find . -name "YourApp.app" -print
-          # You might also use cpack if configured in your CMakeLists.txt
-          echo "Application built. Look for .app bundle or install target in 'build' directory."
+    - name: Package Application (Optional)
+      working-directory: build
+      run: |
+        # If your CMake project generates a .app bundle, you can find it here.
+        # For example, if your target is named 'YourApp'
+        # find . -name "YourApp.app" -print
+        # You might also use cpack if configured in your CMakeLists.txt
+        echo "Application built. Look for .app bundle or install target in 'build' directory."
 
-      - name: Upload Artifact (Optional)
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-app-release
-          path: build/*.app # Adjust path if your app name is different or if you use cpack
+    - name: Upload Artifact (Optional)
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-app-release
+        path: build/*.app # Adjust path if your app name is different or if you use cpack
  
