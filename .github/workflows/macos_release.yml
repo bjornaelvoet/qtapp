@@ -43,7 +43,6 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.13' # Use a specific, common Python 3 version
-        cache: 'pip' # Optional: for caching pip dependencies
 
     - name: Install aqtinstall and its dependencies into the virtual environment
       # The virtual environment should be active from the previous step.
