@@ -27,7 +27,7 @@ on:
         required: true
 
 env:
-  APP_NAME: qtapp
+  APP_NAME: QtApp
   SOURCE_DIR:   ${{ github.workspace }}
   QT_VERSION:   6.9.0
   ARTIFACT:     qtapp_macos_release.zip
