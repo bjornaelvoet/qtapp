@@ -12,6 +12,9 @@ qt_add_executable(appMyFirstQT
     main.cpp
 )
 
+# This resolves all the warnings qmllint gives
+set(QT_QML_GENERATE_QMLLS_INI ON)
+
 qt_add_qml_module(appMyFirstQT
     URI MyFirstQT
     VERSION 1.0
