@@ -27,14 +27,14 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<BoardModel>("GameEnums", 1, 0, "BoardModel", "Access enums only");
 
     // 4. Load your main QML file
-    // Assumes Main.qml is registered as a QML resource.
-    const QUrl url(QStringLiteral("qrc:/QtAppQml/UI/Main.qml"));
-    QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-                     &app, [url](QObject *obj, const QUrl &objUrl) {
-        if (!obj && url == objUrl)
-            QCoreApplication::exit(-1);
-    }, Qt::QueuedConnection);
-    engine.load(url);
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreationFailed,
+        &app,
+        []() { QCoreApplication::exit(-1); },
+        Qt::QueuedConnection);
+
+    engine.loadFromModule("QtAppQml", "Main");
 
     return app.exec();
 }

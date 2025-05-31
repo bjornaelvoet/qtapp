@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(HexGameApp VERSION 0.1 LANGUAGES CXX)
+project(QtApp VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,7 +19,7 @@ qt_standard_project_setup(REQUIRES 6.8)
 set(QT_QML_GENERATE_QMLLS_INI ON)
 
 qt_add_qml_module(QtAppQmlModule
-    URI QtAppQml.UI
+    URI QtAppQml
     VERSION 1.0
     QML_FILES
         Main.qml
@@ -27,12 +27,12 @@ qt_add_qml_module(QtAppQmlModule
         # UnitItem.qml 
     RESOURCES 
         Bluebubble.svg
-    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/QtAppQml/UI 
+    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/QtAppQml
 )
 
 # Define the source files for your executable
 set(APP_SOURCES
-    main.cpp
+    Main.cpp
     BoardModel.cpp
     HexCoordConverter.cpp
 )
@@ -54,9 +54,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     QtAppQmlModule
 )
 
-#include(GNUInstallDirs)
-#install(TARGETS ${PROJECT_NAME}
-#    BUNDLE DESTINATION .
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-#)
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME}
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
