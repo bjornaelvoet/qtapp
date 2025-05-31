@@ -1,0 +1,114 @@
+name: macOS Release
+
+on:
+  push:
+    branches: [ "main","develop","initial"]
+  pull_request:
+    branches: [ "main","develop" ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
+
+env:
+  APP_NAME: qtapp
+  SOURCE_DIR:   ${{ github.workspace }}
+  QT_VERSION:   6.9.0
+  ARTIFACT:     qtapp_macos_release.zip
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python with virtual environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13' # Use a specific, common Python 3 version
+
+    - name: Install aqtinstall and its dependencies into the virtual environment
+      # The virtual environment should be active from the previous step.
+      # `pip` will now install into the venv.
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install aqtinstall
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ env.QT_VERSION }} 
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        tools: 'tools_cmake'
+        setup-python: false
+    
+    - name: Create Build Directory
+      run: mkdir build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: build
+      run: |
+        cmake .. -DCMAKE_BUILD_TYPE=Release \
+                  -DCMAKE_PREFIX_PATH="${{ env.QT_ROOT_DIR }}/lib/cmake"
+    - name: Build Application
+      working-directory: build
+      run: cmake --build . --config Release
+
+    - name: Find and Deploy Application with macdeployqt
+      run: |
+        # Find the .app bundle (adjust if your app name is different or in a subdir)
+        # This assumes the .app is directly in the 'build' directory.
+        APP_BUNDLE_PATH="build/${{ env.APP_NAME }}.app"
+
+        if [ ! -d "$APP_BUNDLE_PATH" ]; then
+          echo "Error: Application bundle $APP_BUNDLE_PATH not found after build."
+          # Try to find it if the name is dynamic or in a subdirectory
+          FOUND_APP=$(find build -name "*.app" -maxdepth 2 -print -quit)
+          if [ -d "$FOUND_APP" ]; then
+            APP_BUNDLE_PATH="$FOUND_APP"
+            echo "Found app bundle at: $APP_BUNDLE_PATH"
+          else
+            echo "Failed to find any .app bundle."
+            exit 1
+          fi
+        fi
+
+        # Get the path to macdeployqt
+        QT_BIN_DIR="${{ env.QT_ROOT_DIR }}/bin"
+        
+        # Run macdeployqt on the application bundle
+        # Add -qmldir=. or -qmldir=<path/to/your/qml/files> if you use QML
+        echo "Running macdeployqt on $APP_BUNDLE_PATH"
+        "${QT_BIN_DIR}/macdeployqt" "$APP_BUNDLE_PATH" -qmldir="${{ env.SOURCE_DIR }}" # Assuming QML in source root
+        
+        # Verify frameworks are copied (optional)
+        echo "Contents of $APP_BUNDLE_PATH/Contents/Frameworks/:"
+        ls -l "$APP_BUNDLE_PATH/Contents/Frameworks/"
+
+    - name: Upload Artifact (Optional)
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-app-release
+        path: build/*.app # Adjust path if your app name is different or if you use cpack
+ 
