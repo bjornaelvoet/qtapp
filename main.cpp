@@ -1,20 +1,13 @@
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
+#include <QQuickView>
 
 int main(int argc, char *argv[])
 {
-    qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
-
     QGuiApplication app(argc, argv);
 
-    QQmlApplicationEngine engine;
-    QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []() { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
-    engine.loadFromModule("Test", "Main");
+    QQuickView view;
+    view.setSource(QUrl::fromLocalFile("application.qml"));
+    view.show();
 
     return app.exec();
 }
