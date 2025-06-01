@@ -6,19 +6,15 @@ import QtQuick.Layouts
 // Importing our custom QML module
 import QtAppQml
 
-// Your C++ backend objects are exposed to the root context
-// You can access them directly by their context property names
-// For example: boardModel, coordConverter
-
 ApplicationWindow {
+
+    // Expose the QML component to other QML components or C++
+    id: appWindow
     visible: true
     width: 1000 // Adjust window size as needed
     height: 800
     title: "Hex Strategy Game (QML)"
     color: "#303030" // Dark background for contrast
-
-    // Expose the QML component to other QML components or C++
-    id: appWindow
 
     // Main game area
     Item {
@@ -36,9 +32,10 @@ ApplicationWindow {
 
             // Each delegate represents one hexagon
             delegate: Hexagon {
+                id: hexagon
                 // Pass properties from the model (QPoint: model.x is row, model.y is col)
-                hexRow: model.x
-                hexCol: model.y
+                hexRow: hexagon.x
+                hexCol: hexagon.y
 
                 // Get the state of this hex from the C++ BoardModel
                 // We use a property alias that reacts to boardModel.hexStateChanged signal
@@ -49,22 +46,22 @@ ApplicationWindow {
                 Connections {
                     target: boardModel
                     function onHexStateChanged(r, c, newState) {
-                        if (r === hexRow && c === hexCol) {
-                            currentHexState = newState;
+                        if (r === hexagon.hexRow && c === hexagon.hexCol) {
+                            hexagon.currentHexState = newState;
                         }
                     }
                 }
 
                 // Calculate the position based on the C++ HexCoordConverter
                 // This ensures consistent pixel coordinates
-                x: coordConverter.hexToPixel(hexRow, hexCol).x
-                y: coordConverter.hexToPixel(hexRow, hexCol).y
+                x: hexCoordConverter.hexToPixel(hexRow, hexCol).x
+                y: hexCoordConverter.hexToPixel(hexRow, hexCol).y
 
                 // When this Hexagon is clicked, call the C++ makeMove method
                 MouseArea {
-                    anchors.fill: parent
+                    anchors.fill: hexagon.parent
                     onClicked: {
-                        boardModel.makeMove(hexRow, hexCol)
+                        boardModel.makeMove(hexagon.hexRow, hexagon.hexCol);
                     }
                 }
 
@@ -72,13 +69,28 @@ ApplicationWindow {
                 SequentialAnimation on currentHexState {
                     // Only animate if the state changes from Empty to something else
                     // or if you want to visually confirm any change
-                    running: currentHexState !== BoardModel.Empty
+                    //running: hexagon.currentHexState !== BoardModel.Empty
+                    running: hexagon.currentHexState !== GameEnums.BoardModel.Empty
 
                     // Animate a brief pulse on the hex when its state changes
                     ParallelAnimation {
-                        NumberAnimation { target: parent; property: "scale"; from: 1.0; to: 1.1; duration: 100; easing.type: Easing.OutCubic }
+                        NumberAnimation {
+                            target: hexagon.parent
+                            property: "scale"
+                            from: 1.0
+                            to: 1.1
+                            duration: 100
+                            easing.type: Easing.OutCubic
+                        }
                         //NumberAnimation { target: parent; property: "scale"; from: 1.1; to: 1.0; duration: 200; easing.type: Easing.InCubic; delay: 100 }
-                        NumberAnimation { target: parent; property: "scale"; from: 1.1; to: 1.0; duration: 200; easing.type: Easing.InCubic}
+                        NumberAnimation {
+                            target: hexagon.parent
+                            property: "scale"
+                            from: 1.1
+                            to: 1.0
+                            duration: 200
+                            easing.type: Easing.InCubic
+                        }
                     }
                 }
 

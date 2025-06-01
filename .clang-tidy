@@ -1,0 +1,56 @@
+# .clang-tidy
+# Place this file in the root of your project directory
+
+# Disable all checks by default, then enable specific ones.
+# This makes it easier to manage which checks are active.
+Checks: >
+  -*, # Disable all checks initially
+  readability-identifier-naming, # Enforce naming conventions
+  bugprone-*, # General bug-prone patterns
+  modernize-*, # Modern C++ recommendations
+  readability-else-after-return, # Style check
+  # Add other checks here based on what parts of Qt style you want to enforce.
+  # For example:
+  # readability-static-accessed-as-non-static,
+  # readability-function-size,
+  # readability-namespace-comments,
+  # google-build-using-namespace # Qt style generally avoids 'using namespace' in headers
+
+# Treat specific warnings as errors
+WarningsAsErrors: "" # e.g., "bugprone-virtual-near-ctor"
+
+# Define the format style if you don't use a separate .clang-format file
+# Or just ensure it's compatible with your .clang-format
+FormatStyle: Qt
+
+# --- Configuration for readability-identifier-naming to match Qt style ---
+# This section customizes the naming rules that 'readability-identifier-naming' check uses.
+ReadabilityIdentifierNaming:
+  # General Case Styles
+  FunctionCase: CamelCase # For public/protected functions
+  MethodCase: camelCase # For class methods (member functions)
+  VariableCase: camelCase # For local variables
+  ParameterCase: camelCase # For function parameters
+  ClassCase: PascalCase # For class names (e.g., MyClass)
+  EnumCase: PascalCase # For enum names (e.g., MyEnum)
+  EnumeratorCase: PascalCase # For enum enumerators (e.g., MyEnum::Value)
+  StructCase: PascalCase # For struct names
+  TypeAliasCase: PascalCase # For 'using' aliases
+
+  # Specific Prefixes (Crucial for Qt style)
+  # Qt typically uses 'm_' prefix for private/protected member variables
+  MemberCase: camelCase # Default for members, then apply prefixes
+  PrivateMemberPrefix: m_
+  ProtectedMemberPrefix: m_
+  PublicMemberPrefix: "" # Public members typically have no prefix in Qt style
+
+
+  # Other prefixes/suffixes if your style requires them
+  # GlobalVariablePrefix: g_
+  # StaticVariablePrefix: s_
+  # ConstantSuffix: _C
+  # MacroCase: SCREAMING_SNAKE_CASE
+
+  # Ignore specific categories if needed (e.g., if you have legacy code)
+  # Ignore:
+  #   - ".*_old"

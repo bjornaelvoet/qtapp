@@ -27,23 +27,36 @@ qt_add_qml_module(QtAppQmlModule
         # UnitItem.qml 
     RESOURCES 
         Bluebubble.svg
+    # Add your C++ files that expose QML types here
+    # CMake will automatically handle the registration for types marked with QML_ELEMENT, QML_SINGLETON, etc.
+    SOURCES
+        BoardModel.cpp
+        HexCoordConverter.cpp
+        BoardModel.h # Include header for MOC processing        
+        HexCoordConverter.h # Include header for MOC processing  
+    PLUGIN_TARGET QtAppQmlModuleplugin # <--- ADDED THIS LINE
     OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/QtAppQml
 )
 
 # Define the source files for your executable
 set(APP_SOURCES
-    Main.cpp
-    BoardModel.cpp
-    HexCoordConverter.cpp
+    main.cpp
+    #BoardModel.cpp
+    #HexCoordConverter.cpp
 )
 
 # Define the MOC-able headers. These will be processed by MOC.
 set(APP_MOC_HEADERS
-    BoardModel.h
-    HexCoordConverter.h
+    #BoardModel.h
+    #HexCoordConverter.h
 )
 
 qt_add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${APP_SOURCES})
+
+# Needed to have the singleton variables be available in the QML context (otherwise unreferenced variables during runtime)
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    QML_MODULE_OUTPUT_DIR="${CMAKE_CURRENT_BINARY_DIR}/QtAppQml"
+)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appTest
