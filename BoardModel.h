@@ -1,38 +1,42 @@
 #ifndef BOARDMODEL_H
 #define BOARDMODEL_H
 
-#include <QObject>
+#include <QAbstractListModel>
 #include <QQmlEngine>
 
-#include <QPoint> // For representing hex coordinates
+#include "HexPosition.h"
 #include <QVector>
 
 // Define the state of a hex cell
-class BoardModel : public QObject {
+class BoardModel : public QAbstractListModel {
   Q_OBJECT
   QML_ELEMENT
   QML_SINGLETON
 
   // Expose properties to QML
   Q_PROPERTY(int boardSize READ boardSize CONSTANT)
-  Q_PROPERTY(QVector<QPoint> hexPositions READ hexPositions NOTIFY boardChanged)
   Q_PROPERTY(int currentPlayer READ currentPlayer NOTIFY currentPlayerChanged)
   Q_PROPERTY(bool gameOver READ gameOver NOTIFY gameOverChanged)
 
 public:
-  BoardModel(QObject *parent = nullptr);
-
   // Enum for hex state (can be made public in BoardModel)
   enum HexState { Empty = 0, Player1 = 1, Player2 = 2 };
   Q_ENUM(HexState) // Makes HexState enum accessible in QML
 
+  enum HexRoles { HexRowRole = Qt::UserRole + 1, HexColRole };
+  Q_ENUM(HexRoles) // This allows you to use BoardModel.HexRowRole in QML
+
+  BoardModel(QObject *parent = nullptr);
+
+  // QAbstractListModel overrides
+  int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+  QVariant data(const QModelIndex &index,
+                int role = Qt::DisplayRole) const override;
+  QHash<int, QByteArray> roleNames() const override;
+
   int boardSize() const { return m_boardSize; }
   int currentPlayer() const { return m_currentPlayer; }
   bool gameOver() const { return m_gameOver; }
-
-  // This method will provide data for the QML Repeater
-  // It returns a list of QPoint (row, col) for each hex
-  QVector<QPoint> hexPositions() const;
 
   // Q_INVOKABLE methods are callable from QML
   Q_INVOKABLE int getHexState(int row, int col) const;
@@ -51,8 +55,9 @@ signals:
 
 private:
   int m_boardSize;
-  QVector<QVector<HexState>> m_board; // 2D array to store hex states
-  int m_currentPlayer;                // 1 or 2
+  QVector<HexPosition *> m_hexPositions; // Stores the positions of hexes
+  QVector<QVector<HexState>> m_board;    // 2D array to store hex states
+  int m_currentPlayer;                   // 1 or 2
   bool m_gameOver;
 
   // Helper functions for game logic (not exposed to QML directly)

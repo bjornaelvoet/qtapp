@@ -5,7 +5,7 @@ project(QtApp VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -20,6 +20,8 @@ set (APP_SOURCES_QML
     BoardModel.cpp
     HexCoordConverter.h  
     HexCoordConverter.cpp
+    HexPosition.h
+    HexPosition.cpp
 )
 
 # Define the app qml files
@@ -55,6 +57,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt6::Core
     Qt6::Quick
 )
 

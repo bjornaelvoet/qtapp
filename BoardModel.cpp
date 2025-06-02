@@ -3,8 +3,19 @@
 #include <QRandomGenerator> // For random initial states (optional)
 
 BoardModel::BoardModel(QObject *parent)
-    : QObject(parent), m_boardSize(10), m_currentPlayer(1), // Player 1 starts
+    : QAbstractListModel(parent), m_boardSize(10),
+      m_currentPlayer(1), // Player 1 starts
       m_gameOver(false) {
+
+  // Create the model with an initial list of hex positions
+  beginResetModel();
+  for (int r = 0; r < m_boardSize; ++r) {
+    for (int c = 0; c < m_boardSize; ++c) {
+      m_hexPositions.append(new HexPosition(r, c, this));
+    }
+  }
+  endResetModel();
+
   initializeBoard();
 }
 
@@ -22,14 +33,33 @@ void BoardModel::initializeBoard() {
   emit gameOverChanged(); // Reset game over state
 }
 
-QVector<QPoint> BoardModel::hexPositions() const {
-  QVector<QPoint> positions;
-  for (int r = 0; r < m_boardSize; ++r) {
-    for (int c = 0; c < m_boardSize; ++c) {
-      positions.append(QPoint(r, c));
-    }
+int BoardModel::rowCount(const QModelIndex &parent) const {
+  if (parent.isValid())
+    return 0;
+  return m_hexPositions.count();
+}
+
+QVariant BoardModel::data(const QModelIndex &index, int role) const {
+  if (!index.isValid() || index.row() >= m_hexPositions.count())
+    return QVariant();
+
+  HexPosition *hex = m_hexPositions.at(index.row());
+
+  switch (role) {
+  case HexRowRole:
+    return hex->row();
+  case HexColRole:
+    return hex->col();
+  default:
+    return QVariant();
   }
-  return positions;
+}
+
+QHash<int, QByteArray> BoardModel::roleNames() const {
+  QHash<int, QByteArray> roles;
+  roles[HexRowRole] = "hexRow";
+  roles[HexColRole] = "hexCol";
+  return roles;
 }
 
 int BoardModel::getHexState(int row, int col) const {
@@ -81,13 +111,13 @@ void BoardModel::nextTurn() {
 }
 
 // Dummy win condition check for now.
-// You'll replace this with actual Hex win logic (e.g., pathfinding from side to
-// side).
+// You'll replace this with actual Hex win logic (e.g., pathfinding from side
+// to side).
 bool BoardModel::checkWinCondition(int player) const {
-  // For a real Hex game, this involves pathfinding from one side to the other.
-  // E.g., Player 1 connects top to bottom, Player 2 connects left to right.
-  // This dummy version just checks if the first row is full for Player 1, or
-  // last row for Player 2
+  // For a real Hex game, this involves pathfinding from one side to the
+  // other. E.g., Player 1 connects top to bottom, Player 2 connects left to
+  // right. This dummy version just checks if the first row is full for Player
+  // 1, or last row for Player 2
   if (player == 1) {
     for (int c = 0; c < m_boardSize; ++c) {
       if (m_board[0][c] != Player1)

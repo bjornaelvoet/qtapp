@@ -28,14 +28,14 @@ ApplicationWindow {
         // The model comes from our C++ BoardModel's hexPositions() method
         Repeater {
             id: hexGridRepeater
-            model: BoardModel.hexPositions // QPoint list from C++ BoardModel
+            model: BoardModel // C++ BoardModel derives from QAbstractListModel
 
             // Each delegate represents one hexagon
             delegate: Hexagon {
                 id: hexagon
                 // Pass properties from the model (QPoint: model.x is row, model.y is col)
-                hexRow: hexagon.x
-                hexCol: hexagon.y
+                hexRow: model.hexRow
+                hexCol: model.hexCol
 
                 // Get the state of this hex from the C++ BoardModel
                 // We use a property alias that reacts to boardModel.hexStateChanged signal
