@@ -5,45 +5,48 @@ project(QtApp VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS 
-    Core
-    Gui
-    Widgets
-    Qml
-    Quick
-)
+find_package(Qt6 REQUIRED COMPONENTS Core Quick)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-# This resolves all the warnings qmllint gives
-set(QT_QML_GENERATE_QMLLS_INI ON)
-
-qt_add_qml_module(QtAppQmlModule
-    URI QtAppQml
-    VERSION 1.0
-    QML_FILES
-        Main.qml
-        Hexagon.qml
-        # UnitItem.qml 
-    RESOURCES 
-        Bluebubble.svg
-    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/QtAppQml
-)
-
 # Define the source files for your executable
 set(APP_SOURCES
-    Main.cpp
-    BoardModel.cpp
-    HexCoordConverter.cpp
+    main.cpp
 )
 
-# Define the MOC-able headers. These will be processed by MOC.
-set(APP_MOC_HEADERS
-    BoardModel.h
-    HexCoordConverter.h
+set (APP_SOURCES_QML
+    # Include headers for MOC processing    
+    BoardModel.h        
+    BoardModel.cpp
+    HexCoordConverter.h  
+    HexCoordConverter.cpp
+    HexPosition.h
+    HexPosition.cpp
+)
+
+# Define the app qml files
+set (APP_QML_FILES
+    Main.qml
+    Hexagon.qml
+)
+
+# Define the app resources
+set (APP_RESOURCES
+    Bluebubble.svg
 )
 
 qt_add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${APP_SOURCES})
+
+qt_add_qml_module(${PROJECT_NAME}
+    URI QtAppQml
+    VERSION 1.0
+    QML_FILES
+        ${APP_QML_FILES}
+    RESOURCES 
+        ${APP_RESOURCES}
+    SOURCES
+        ${APP_SOURCES_QML}
+)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appTest
@@ -54,12 +57,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt6::Quick
     Qt6::Core
-    Qt6::Gui
-    Qt6::Widgets
-    Qt6::Qml
-    QtAppQmlModule
+    Qt6::Quick
 )
 
 include(GNUInstallDirs)

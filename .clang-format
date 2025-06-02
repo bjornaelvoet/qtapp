@@ -1,0 +1,12 @@
+# .clang-format
+# Place this file in the root of your project directory
+
+# Set the base style to Qt's predefined formatting rules
+Style: Qt
+# You can override specific Qt style rules here if you have minor deviations.
+# For example, if you prefer a different IndentWidth or BraceWrapping
+# IndentWidth: 4
+# BraceWrapping:
+#   AfterClass: false
+#   AfterControlStatement: false
+#   ...
