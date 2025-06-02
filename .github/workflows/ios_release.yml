@@ -53,8 +53,8 @@ jobs:
         cmake .. -G Xcode \
                   -DCMAKE_SYSTEM_NAME=iOS \
                   -DCMAKE_BUILD_TYPE=Release \
-                  -DCMAKE_PREFIX_PATH="${{ env.QT_ROOT_DIR }}/lib/cmake" \
                   -DQT_HOST_PATH="${{ env.QT_HOST_PATH }}" \
+                  -DQt6_DIR="${{ env.QT_CMAKE_DIR }}" \
                   -DQT_IOS_DEPLOYMENT_TARGET="13.0" \
                   -DMACOSX_BUNDLE_GUI_IDENTIFIER="com.example.${{ env.APP_NAME }}"
                   
