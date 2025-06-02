@@ -7,14 +7,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
 
-# This resolves all the warnings qmllint gives
-#set(QT_QML_GENERATE_QMLLS_INI ON)
-
 qt_standard_project_setup(REQUIRES 6.8)
 
 # Define the source files for your executable
 set(APP_SOURCES
     main.cpp
+)
+
+set (APP_SOURCES_QML
+    # Include headers for MOC processing    
+    BoardModel.h        
+    BoardModel.cpp
+    HexCoordConverter.h  
+    HexCoordConverter.cpp
+)
+
+# Define the app qml files
+set (APP_QML_FILES
+    Main.qml
+    Hexagon.qml
+)
+
+# Define the app resources
+set (APP_RESOURCES
+    Bluebubble.svg
 )
 
 qt_add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${APP_SOURCES})
@@ -23,16 +39,11 @@ qt_add_qml_module(${PROJECT_NAME}
     URI QtAppQml
     VERSION 1.0
     QML_FILES
-        Main.qml
-        Hexagon.qml
-        # UnitItem.qml 
+        ${APP_QML_FILES}
     RESOURCES 
-        Bluebubble.svg
+        ${APP_RESOURCES}
     SOURCES
-        BoardModel.h # Include header for MOC processing        
-        BoardModel.cpp
-        HexCoordConverter.h # Include header for MOC processing  
-        HexCoordConverter.cpp
+        ${APP_SOURCES_QML}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

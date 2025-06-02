@@ -59,7 +59,7 @@ ApplicationWindow {
 
                 // When this Hexagon is clicked, call the C++ makeMove method
                 MouseArea {
-                    anchors.fill: hexGridRepeater.parent
+                    anchors.fill: parent
                     onClicked: {
                         BoardModel.makeMove(hexagon.hexRow, hexagon.hexCol);
                     }
@@ -70,7 +70,7 @@ ApplicationWindow {
                     // Only animate if the state changes from Empty to something else
                     // or if you want to visually confirm any change
                     //running: hexagon.currentHexState !== BoardModel.Empty
-                    running: hexagon.currentHexState !== GameEnums.BoardModel.Empty
+                    running: hexagon.currentHexState !== BoardModel.Empty
 
                     // Animate a brief pulse on the hex when its state changes
                     ParallelAnimation {

@@ -56,3 +56,4 @@ compile_commands.json
 *_qmlcache.qrc
 .qmlls.ini
 .vscode/
+.vscode/settings.json
