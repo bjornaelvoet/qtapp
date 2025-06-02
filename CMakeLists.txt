@@ -5,20 +5,21 @@ project(QtApp VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS 
-    Core
-    Gui
-    Widgets
-    Qml
-    Quick
-)
+find_package(Qt6 REQUIRED COMPONENTS Quick)
+
+# This resolves all the warnings qmllint gives
+#set(QT_QML_GENERATE_QMLLS_INI ON)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-# This resolves all the warnings qmllint gives
-set(QT_QML_GENERATE_QMLLS_INI ON)
+# Define the source files for your executable
+set(APP_SOURCES
+    main.cpp
+)
 
-qt_add_qml_module(QtAppQmlModule
+qt_add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${APP_SOURCES})
+
+qt_add_qml_module(${PROJECT_NAME}
     URI QtAppQml
     VERSION 1.0
     QML_FILES
@@ -27,35 +28,11 @@ qt_add_qml_module(QtAppQmlModule
         # UnitItem.qml 
     RESOURCES 
         Bluebubble.svg
-    # Add your C++ files that expose QML types here
-    # CMake will automatically handle the registration for types marked with QML_ELEMENT, QML_SINGLETON, etc.
     SOURCES
-        BoardModel.cpp
-        HexCoordConverter.cpp
         BoardModel.h # Include header for MOC processing        
+        BoardModel.cpp
         HexCoordConverter.h # Include header for MOC processing  
-    PLUGIN_TARGET QtAppQmlModuleplugin # <--- ADDED THIS LINE
-    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/QtAppQml
-)
-
-# Define the source files for your executable
-set(APP_SOURCES
-    main.cpp
-    #BoardModel.cpp
-    #HexCoordConverter.cpp
-)
-
-# Define the MOC-able headers. These will be processed by MOC.
-set(APP_MOC_HEADERS
-    #BoardModel.h
-    #HexCoordConverter.h
-)
-
-qt_add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${APP_SOURCES})
-
-# Needed to have the singleton variables be available in the QML context (otherwise unreferenced variables during runtime)
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-    QML_MODULE_OUTPUT_DIR="${CMAKE_CURRENT_BINARY_DIR}/QtAppQml"
+        HexCoordConverter.cpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -68,11 +45,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Quick
-    Qt6::Core
-    Qt6::Gui
-    Qt6::Widgets
-    Qt6::Qml
-    QtAppQmlModule
 )
 
 include(GNUInstallDirs)

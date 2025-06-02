@@ -28,7 +28,7 @@ ApplicationWindow {
         // The model comes from our C++ BoardModel's hexPositions() method
         Repeater {
             id: hexGridRepeater
-            model: boardModel.hexPositions // QPoint list from C++ BoardModel
+            model: BoardModel.hexPositions // QPoint list from C++ BoardModel
 
             // Each delegate represents one hexagon
             delegate: Hexagon {
@@ -39,12 +39,12 @@ ApplicationWindow {
 
                 // Get the state of this hex from the C++ BoardModel
                 // We use a property alias that reacts to boardModel.hexStateChanged signal
-                property int currentHexState: boardModel.getHexState(hexRow, hexCol)
+                property int currentHexState: BoardModel.getHexState(hexRow, hexCol)
 
                 // Update hex color when state changes (C++ signal connects to this)
                 // This connection ensures the QML Hexagon updates when BoardModel emits hexStateChanged
                 Connections {
-                    target: boardModel
+                    target: BoardModel
                     function onHexStateChanged(r, c, newState) {
                         if (r === hexagon.hexRow && c === hexagon.hexCol) {
                             hexagon.currentHexState = newState;
@@ -54,14 +54,14 @@ ApplicationWindow {
 
                 // Calculate the position based on the C++ HexCoordConverter
                 // This ensures consistent pixel coordinates
-                x: hexCoordConverter.hexToPixel(hexRow, hexCol).x
-                y: hexCoordConverter.hexToPixel(hexRow, hexCol).y
+                x: HexCoordConverter.hexToPixel(hexRow, hexCol).x
+                y: HexCoordConverter.hexToPixel(hexRow, hexCol).y
 
                 // When this Hexagon is clicked, call the C++ makeMove method
                 MouseArea {
-                    anchors.fill: hexagon.parent
+                    anchors.fill: hexGridRepeater.parent
                     onClicked: {
-                        boardModel.makeMove(hexagon.hexRow, hexagon.hexCol);
+                        BoardModel.makeMove(hexagon.hexRow, hexagon.hexCol);
                     }
                 }
 
@@ -128,7 +128,7 @@ ApplicationWindow {
 
             Label {
                 id: currentPlayerLabel
-                text: "Current Player: " + (boardModel.currentPlayer === 1 ? "Blue" : "Red")
+                text: "Current Player: " + (BoardModel.currentPlayer === 1 ? "Blue" : "Red")
                 font.pointSize: 18
                 color: "white"
                 Layout.alignment: Qt.AlignHCenter
@@ -136,15 +136,15 @@ ApplicationWindow {
 
             Label {
                 id: gameOverLabel
-                text: boardModel.gameOver ? (boardModel.currentPlayer === 1 ? "Red Wins!" : "Blue Wins!") : ""
+                text: BoardModel.gameOver ? (BoardModel.currentPlayer === 1 ? "Red Wins!" : "Blue Wins!") : ""
                 font.pointSize: 24
-                color: boardModel.gameOver ? "gold" : "transparent"
+                color: BoardModel.gameOver ? "gold" : "transparent"
                 Layout.alignment: Qt.AlignHCenter
             }
 
             Button {
                 text: "Reset Game"
-                onClicked: boardModel.resetGame()
+                onClicked: BoardModel.resetGame()
                 Layout.alignment: Qt.AlignHCenter
                 Layout.topMargin: 20
             }

@@ -2,24 +2,21 @@
 #define HEXCOORDCONVERTER_H
 
 #include <QObject>
-#include <QPointF>                  // For pixel coordinates
-#include <QtQml/qqmlregistration.h> // For QML_SINGLETON
+#include <QQmlEngine>
+
+#include <QObject>
+#include <QPointF> // For pixel coordinates
 
 class HexCoordConverter : public QObject {
   Q_OBJECT
-  QML_NAMED_ELEMENT(hexCoordConverter)
-  QML_SINGLETON
   QML_ELEMENT
-public:
-  HexCoordConverter(QObject *parent = nullptr)
-      : QObject(parent), m_hexRadius(50.0) {}
+  QML_SINGLETON
 
-private:
   Q_PROPERTY(
       qreal hexRadius READ hexRadius CONSTANT) // Expose hex radius for QML
 
 public:
-  explicit HexCoordConverter(qreal radius, QObject *parent = nullptr);
+  HexCoordConverter(QObject *parent = nullptr);
 
   qreal hexRadius() const { return m_hexRadius; }
 

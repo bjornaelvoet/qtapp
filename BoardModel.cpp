@@ -2,8 +2,8 @@
 #include <QDebug>
 #include <QRandomGenerator> // For random initial states (optional)
 
-BoardModel::BoardModel(int size, QObject *parent)
-    : QObject(parent), m_boardSize(size), m_currentPlayer(1), // Player 1 starts
+BoardModel::BoardModel(QObject *parent)
+    : QObject(parent), m_boardSize(10), m_currentPlayer(1), // Player 1 starts
       m_gameOver(false) {
   initializeBoard();
 }

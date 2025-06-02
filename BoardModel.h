@@ -1,23 +1,18 @@
 #ifndef BOARDMODEL_H
 #define BOARDMODEL_H
 
-#include <QJSEngine> // Required for QJSEngine in qmlInstance signature
 #include <QObject>
-#include <QPoint>     // For representing hex coordinates
-#include <QQmlEngine> // Required for QQmlEngine in qmlInstance signature
+#include <QQmlEngine>
+
+#include <QPoint> // For representing hex coordinates
 #include <QVector>
-#include <QtQml/qqmlregistration.h> // For QML_SINGLETON
 
 // Define the state of a hex cell
 class BoardModel : public QObject {
   Q_OBJECT
   QML_ELEMENT
   QML_SINGLETON
-  QML_NAMED_ELEMENT(boardModel)
-public:
-  BoardModel(QObject *parent = nullptr) : QObject(parent), m_boardSize(10) {}
 
-private:
   // Expose properties to QML
   Q_PROPERTY(int boardSize READ boardSize CONSTANT)
   Q_PROPERTY(QVector<QPoint> hexPositions READ hexPositions NOTIFY boardChanged)
@@ -25,16 +20,11 @@ private:
   Q_PROPERTY(bool gameOver READ gameOver NOTIFY gameOverChanged)
 
 public:
+  BoardModel(QObject *parent = nullptr);
+
   // Enum for hex state (can be made public in BoardModel)
   enum HexState { Empty = 0, Player1 = 1, Player2 = 2 };
   Q_ENUM(HexState) // Makes HexState enum accessible in QML
-  // This is the constructor used by qmlInstance.
-  // The explicit BoardModel(int size, ...) constructor declaration is removed
-  // to avoid potential ambiguity during QML module generation.
-  BoardModel(int size, QObject *parent = nullptr);
-
-  // This static method is required by QML_SINGLETON to provide the instance
-  static BoardModel *qmlInstance(QQmlEngine *engine, QJSEngine *scriptEngine);
 
   int boardSize() const { return m_boardSize; }
   int currentPlayer() const { return m_currentPlayer; }
