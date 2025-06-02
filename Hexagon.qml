@@ -3,9 +3,10 @@ import QtQuick
 import QtQuick.Shapes
 
 Item {
-    id: hexRoot
-    property int hexRow: 0
-    property int hexCol: 0
+    id: hexagonRoot
+    required property int hexRow
+    required property int hexCol
+
     property int currentHexState: 0
     property real hexSize: HexCoordConverter.hexRadius
 
@@ -22,40 +23,40 @@ Item {
             strokeColor: mouseArea.containsMouse ? "#2ecc71" : "black"
             strokeWidth: mouseArea.containsMouse ? 4 : 2
             fillColor: {
-                if (hexRoot.currentHexState === BoardModel.Player1)
+                if (hexagonRoot.currentHexState === BoardModel.Player1)
                     return "#3498db";
-                if (hexRoot.currentHexState === BoardModel.Player2)
+                if (hexagonRoot.currentHexState === BoardModel.Player2)
                     return "#e74c3c";
                 return "#cccccc";
             }
 
-            startX: hexSize * Math.cos(Math.PI / 6)
-            startY: hexSize * Math.sin(Math.PI / 6)
+            startX: hexagonRoot.hexSize * Math.cos(Math.PI / 6)
+            startY: hexagonRoot.hexSize * Math.sin(Math.PI / 6)
 
             // Loop through 6 sides
             PathLine {
-                x: hexSize * Math.cos(Math.PI / 2)
-                y: hexSize * Math.sin(Math.PI / 2)
+                x: hexagonRoot.hexSize * Math.cos(Math.PI / 2)
+                y: hexagonRoot.hexSize * Math.sin(Math.PI / 2)
             }
             PathLine {
-                x: hexSize * Math.cos(5 * Math.PI / 6)
-                y: hexSize * Math.sin(5 * Math.PI / 6)
+                x: hexagonRoot.hexSize * Math.cos(5 * Math.PI / 6)
+                y: hexagonRoot.hexSize * Math.sin(5 * Math.PI / 6)
             }
             PathLine {
-                x: hexSize * Math.cos(7 * Math.PI / 6)
-                y: hexSize * Math.sin(7 * Math.PI / 6)
+                x: hexagonRoot.hexSize * Math.cos(7 * Math.PI / 6)
+                y: hexagonRoot.hexSize * Math.sin(7 * Math.PI / 6)
             }
             PathLine {
-                x: hexSize * Math.cos(3 * Math.PI / 2)
-                y: hexSize * Math.sin(3 * Math.PI / 2)
+                x: hexagonRoot.hexSize * Math.cos(3 * Math.PI / 2)
+                y: hexagonRoot.hexSize * Math.sin(3 * Math.PI / 2)
             }
             PathLine {
-                x: hexSize * Math.cos(11 * Math.PI / 6)
-                y: hexSize * Math.sin(11 * Math.PI / 6)
+                x: hexagonRoot.hexSize * Math.cos(11 * Math.PI / 6)
+                y: hexagonRoot.hexSize * Math.sin(11 * Math.PI / 6)
             }
             PathLine {
-                x: hexSize * Math.cos(Math.PI / 6)
-                y: hexSize * Math.sin(Math.PI / 6)
+                x: hexagonRoot.hexSize * Math.cos(Math.PI / 6)
+                y: hexagonRoot.hexSize * Math.sin(Math.PI / 6)
             }
         }
     }

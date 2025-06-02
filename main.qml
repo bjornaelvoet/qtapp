@@ -33,9 +33,6 @@ ApplicationWindow {
             // Each delegate represents one hexagon
             delegate: Hexagon {
                 id: hexagon
-                // Pass properties from the model (QPoint: model.x is row, model.y is col)
-                hexRow: model.hexRow
-                hexCol: model.hexCol
 
                 // Get the state of this hex from the C++ BoardModel
                 // We use a property alias that reacts to boardModel.hexStateChanged signal
@@ -44,7 +41,7 @@ ApplicationWindow {
                 // Update hex color when state changes (C++ signal connects to this)
                 // This connection ensures the QML Hexagon updates when BoardModel emits hexStateChanged
                 Connections {
-                    target: BoardModel
+                    target: BoardModel as QtObject
                     function onHexStateChanged(r, c, newState) {
                         if (r === hexagon.hexRow && c === hexagon.hexCol) {
                             hexagon.currentHexState = newState;

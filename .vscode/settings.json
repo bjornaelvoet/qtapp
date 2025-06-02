@@ -1,0 +1,36 @@
+{
+    // C/C++ Extension settings
+    "C_Cpp.default.configurationProvider": "", // Recommended for CMake projects
+    "C_Cpp.errorSquiggles": "enabled", // Show errors as you type
+    // Clang-Tidy (Linting) settings
+    "C_Cpp.clangTidy.enabled": true, // Enable Clang-Tidy checks
+    "C_Cpp.clangTidy.runAutomatically": true, // Run checks as you type/save
+    "C_Cpp.clangTidy.debounce": 200, // Delay in ms before running checks
+    "C_Cpp.clangTidy.args": [
+        // You can add global clang-tidy arguments here.
+        // For detailed, project-specific checks and style rules, a .clang-tidy file is used.
+        // If you don't use a .clang-tidy file, you'd specify checks here:
+        // "-checks=readability-*,bugprone-*,modernize-*,clang-analyzer-*"
+    ],
+    // If clang-tidy executable is not in your system's PATH, specify its full path:
+    // "C_Cpp.clangTidy.path": "/usr/local/opt/llvm/bin/clang-tidy", // Example for macOS Homebrew LLVM
+    // Clang-Format (Formatting) settings - strongly recommended alongside linting
+    "C_Cpp.clang_format_style": "file", // Tell VS Code to look for a .clang-format file
+    // If clang-format executable is not in your system's PATH, specify its full path:
+    // "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format", // Example for macOS Homebrew LLVM
+    "C_Cpp.formatting.provider": "clangFormat", // Use clang-format for formatting
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "qqmlcontext": "cpp",
+        "qqmlapplicationengine": "cpp",
+        "qrandomgenerator": "cpp",
+        "qvector": "cpp",
+        "qguiapplication": "cpp",
+        "qdebug": "cpp",
+        "qtmath": "cpp",
+        "qgraphicsscenemouseevent": "cpp",
+        "memory": "cpp",
+        "qpen": "cpp",
+        "qtimer": "cpp"
+    } // Automatically format on save (optional but highly recommended)
+}
