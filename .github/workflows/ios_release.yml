@@ -41,7 +41,6 @@ jobs:
         host: 'mac'
         target: 'ios'
         arch: 'ios'
-        tools: 'tools_cmake'
         setup-python: false
     
     - name: Create Build Directory
