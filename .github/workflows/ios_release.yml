@@ -58,7 +58,7 @@ jobs:
       shell: bash
       working-directory: build
       run: |
-        cmake .. -G Xcode
+        configure.sh
                   
     - name: Build Application
       working-directory: build
