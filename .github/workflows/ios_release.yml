@@ -46,11 +46,13 @@ jobs:
     - name: Create Build Directory
       run: mkdir build
 
-    - name: [DEBUG] Which CMake?
+    - name: \[DEBUG] Which CMake?
       shell: bash
+      working-directory: build
       run: |
         which cmake
         cmake --version
+
     - name: Configure CMake
       shell: bash
       working-directory: build
