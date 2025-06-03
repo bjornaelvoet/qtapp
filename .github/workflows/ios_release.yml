@@ -58,21 +58,15 @@ jobs:
       shell: bash
       working-directory: build
       run: |
-        cmake .. -G Xcode \
-                  -DCMAKE_SYSTEM_NAME=iOS \
-                  -DCMAKE_BUILD_TYPE=Release \
-                  -DQT_HOST_PATH="${{ env.QT_HOST_PATH }}" \
-                  -DQt6_DIR="${{ env.QT_CMAKE_DIR }}" \
-                  -DQT_IOS_DEPLOYMENT_TARGET="13.0" \
-                  -DMACOSX_BUNDLE_GUI_IDENTIFIER="com.example.${{ env.APP_NAME }}"
+        cmake .. -G Xcode
                   
     - name: Build Application
       working-directory: build
-      run: cmake --build . --config Release
+      run: xcodebuild build -allowProvisioningUpdates -project QtApp.xcodeproj -scheme QtApp -configuration Debug -destination "generic/platform=iOS" -destination-timeout 1 ENABLE_ONLY_ACTIVE_RESOURCES=NO
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: ios-app-bundle
         # The .app bundle is typically found in build/<Configuration>-iphoneos/<AppName>.app when using the Xcode generator
-        path: build/Release-iphoneos/${{ env.APP_NAME }}.app 
+        path: build/Debug-iphoneos/${{ env.APP_NAME }}.app 
