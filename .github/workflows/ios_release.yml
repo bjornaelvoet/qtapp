@@ -63,7 +63,14 @@ jobs:
                   
     - name: Build Application
       working-directory: build
-      run: xcodebuild build -allowProvisioningUpdates -project QtApp.xcodeproj -scheme QtApp -configuration Debug -destination "generic/platform=iOS" -destination-timeout 1 ENABLE_ONLY_ACTIVE_RESOURCES=NO
+      #run: xcodebuild build -allowProvisioningUpdates -project QtApp.xcodeproj -scheme QtApp -configuration Debug -destination "generic/platform=iOS" -destination-timeout 1 ENABLE_ONLY_ACTIVE_RESOURCES=NO
+      run: xcodebuild \
+              -project QtApp.xcodeproj \
+              -scheme QtApp \
+              -sdk iphonesimulator \
+              -configuration Debug \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
