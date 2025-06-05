@@ -23,6 +23,7 @@ jobs:
     - name: Configure and build
       shell: bash
       run: |
+        chmod +x ./configure_build_macos.sh
         ./configure_build_macos.h
 
     - name: Upload Artifact
