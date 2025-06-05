@@ -99,12 +99,3 @@ xcodebuild \
     -configuration ${BUILD_TYPE} \
     CODE_SIGN_IDENTITY="" \
     CODE_SIGNING_REQUIRED=NO
-
-# Bundling application
-#if [ "$CI" = "true" ]; then
-#    echo "Bundling application and making dmg"
-#    "${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=.. -dmg
-#else
-#    echo "Bundling application"
-#    "${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=..
-#fi
