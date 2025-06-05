@@ -47,8 +47,9 @@ fi
 
 # Install Qt if not already installed
 if [ "$CI" = "true" ]; then
-    echo "Installing necessary Qt modules"
+    echo "List of possible Qt modules"
     aqt list-qt mac desktop --long-modules 6.9.1 clang_64
+    echo "Installing necessary Qt modules"
     aqt install-qt mac desktop ${QT_VERSION} clang_64 --outputdir ${QT_INSTALL_BASE_DIR} --modules qtquick3d
 else
     echo "Run qt if not already installed"
@@ -77,5 +78,13 @@ cmake .. -DCMAKE_PREFIX_PATH=${QT_CMAKE_DIR} -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
 echo "Building application"
 cmake --build . --config ${BUILD_TYPE}
 
-# Bundle app with necessary libraries
-"${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=..
+
+
+# Bundling application
+if [ "$CI" = "true" ]; then
+    echo "Bundling application and making dmg"
+    "${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=.. -dmg
+else
+    echo "Bundling application"
+    "${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=..
+fi

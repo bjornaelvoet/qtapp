@@ -8,10 +8,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  APP_NAME: QtApp
-  ARTIFACT:     qtapp_macos_release.zip
-
 jobs:
   build-and-deploy:
     runs-on: macos-latest
@@ -23,12 +19,11 @@ jobs:
     - name: Configure and build
       shell: bash
       run: |
-        ls -alh
         chmod +x ./configure_build_macos.sh
         ./configure_build_macos.sh
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: macos-app-release
-        path: build/*.app # Adjust path if your app name is different or if you use cpack
+        name: macos-app
+        path: build/*.dmg
