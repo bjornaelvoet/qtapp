@@ -1,5 +1,46 @@
 #!/bin/bash
 
+# Check if an argument was provided
+if [ -z "$1" ]; then
+  echo "Usage: $0 -h or $0 --help for more information"
+  exit 1
+fi
+
+# Help on arguments
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+  echo "Usage: $0 -b <macos|ios> [options]"
+  echo ""
+  echo "Required arguments:"
+  echo "  -b, --build <macos|ios>     Name of the target to build against"
+  echo "Optional arguments:"
+  echo "  -h, --help                  Show this help message and exit"
+  exit 0
+fi
+
+# Default values
+BUILD_TARGET=""
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+  -b|--build)
+    BUILD_TARGET="$2"
+    shift 2
+    ;;
+  *)
+    echo "Unknown option: $1"
+    exit 1
+    ;;
+  esac
+done
+
+# Validate the required arguments
+# Validate build argument
+if [[ "$BUILD_TARGET" != "ios" && "$BUILD_TARGET" != "macos" ]]; then
+  echo "Error: Invalid build target '$BUILD_TARGET'. See help for build targets."
+  exit 1
+fi
+
 # Determine project source directory
 if [ -n "$GITHUB_WORKSPACE" ]; then
   # Running in GitHub Actions
@@ -8,12 +49,27 @@ else
   # Running locally. Assume configure.sh is in the project root.
   # Get the absolute path of the directory containing this script.
   SOURCE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+  source local_env.sh
+  case "$BUILD_TARGET" in
+  ios)
+    QT_ROOT_DIR="${QT_ROOT_DIR_69_IOS}"
+    ;;
+  macos)
+    QT_ROOT_DIR="${QT_ROOT_DIR_69_MACOS}"
+    ;;
+  *)
+    echo "Error: Unknown build target $BUILD_TARGET."
+    exit 1
+    ;;
+  esac
 fi
 
 BUILD_DIR="${SOURCE_DIR}/build"
 
 echo "Source directory: ${SOURCE_DIR}"
 echo "Build directory: ${BUILD_DIR}"
+echo "Qt root directory: ${QT_ROOT_DIR}"
+
 mkdir -p "${BUILD_DIR}"
 
 # QT_ROOT_DIR must be set in the environment.
