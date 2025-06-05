@@ -7,12 +7,6 @@ on:
     branches: [ "main","develop" ]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-    
-env:
-  APP_NAME: QtApp
-  SOURCE_DIR:   ${{ github.workspace }}
-  QT_VERSION:   6.9.0
-  ARTIFACT:     qtapp_ios_release.zip
 
 jobs:
   build-and-deploy:
@@ -22,59 +16,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Python with virtual environment
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.13' # Use a specific, common Python 3 version
-
-    - name: Install aqtinstall and its dependencies into the virtual environment
-      # The virtual environment should be active from the previous step.
-      # `pip` will now install into the venv.
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install aqtinstall
-
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ env.QT_VERSION }} 
-        host: 'mac'
-        target: 'ios'
-        arch: 'ios'
-        setup-python: false
-    
-    - name: Create Build Directory
-      run: mkdir build
-
-    - name: \[DEBUG] Which CMake and which env vars?
+    - name: Configure and build
       shell: bash
-      working-directory: build
       run: |
-        which cmake
-        cmake --version
-        env
-
-    - name: Configure CMake
-      shell: bash
-      working-directory: .
-      run: |
-        chmod +x ./configure.sh
-        ./configure.sh
-                  
-    - name: Build Application
-      working-directory: build
-      #run: xcodebuild build -allowProvisioningUpdates -project QtApp.xcodeproj -scheme QtApp -configuration Debug -destination "generic/platform=iOS" -destination-timeout 1 ENABLE_ONLY_ACTIVE_RESOURCES=NO
-      run: xcodebuild \
-              -project QtApp.xcodeproj \
-              -scheme QtApp \
-              -sdk iphonesimulator \
-              -configuration Debug \
-              CODE_SIGN_IDENTITY="" \
-              CODE_SIGNING_REQUIRED=NO
+        chmod +x ./configure_build_ios.sh
+        ./configure_build_ios.sh
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ios-app-bundle
-        # The .app bundle is typically found in build/<Configuration>-iphoneos/<AppName>.app when using the Xcode generator
-        path: build/Debug-iphoneos/${{ env.APP_NAME }}.app 
+        name: ios-qtapp
+        path: build/*.ipa

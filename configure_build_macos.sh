@@ -23,6 +23,7 @@ fi
 
 # Show the environment variables
 echo "APP_NAME: ${APP_NAME}"
+echo "BUILD_TYPE: ${BUILD_TYPE}"
 echo "QT_VERSION: ${QT_VERSION}"
 echo "BUILD_DIR: ${BUILD_DIR}"
 echo "QT_INSTALL_BASE_DIR: ${QT_INSTALL_BASE_DIR}"
