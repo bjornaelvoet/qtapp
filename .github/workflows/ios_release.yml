@@ -25,5 +25,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ios-qtapp
-        path: build/*.ipa
+        name: macos-app
+        path: build/${BUILD_TYPE}-iphonesimulator/*.app
