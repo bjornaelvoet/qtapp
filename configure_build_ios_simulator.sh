@@ -10,7 +10,6 @@ QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
 # Construct helper paths
 QT_CMAKE_DIR="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/ios/lib/cmake"
-MAC_DEPLOY_QT="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/ios/bin/macdeployqt"
 QT_HOST_PATH="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/macos"
 IOS_TOOLCHAIN_FILE="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/ios/lib/cmake/Qt6/qt.toolchain.cmake"
 
@@ -29,10 +28,11 @@ echo "APP_NAME: ${APP_NAME}"
 echo "BUILD_TYPE: ${BUILD_TYPE}"
 echo "QT_VERSION: ${QT_VERSION}"
 echo "BUILD_DIR: ${BUILD_DIR}"
+echo "SOURCE_DIR: ${SOURCE_DIR}"
 echo "QT_INSTALL_BASE_DIR: ${QT_INSTALL_BASE_DIR}"
 echo "QT_CMAKE_DIR: ${QT_CMAKE_DIR}"
-echo "MAC_DEPLOY_QT: ${MAC_DEPLOY_QT}"
 echo "QT_HOST_PATH: ${QT_HOST_PATH}"
+echo "IOS_TOOLCHAIN_FILE: ${IOS_TOOLCHAIN_FILE}"
 
 # Install cmake if not already installed
 if [ "$CI" = "true" ]; then
@@ -75,27 +75,37 @@ else
     rm -rf "${BUILD_DIR}/CMakeFiles"
 fi
 
-# Configure cmake
+# CMake info
+cmake --version
+cmake -E capabilities
+
+# Configure cmake (get example by configuring a dummy project in QTCreator)
 echo "Configuring cmake"
-cmake -G Xcode \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE \
+cmake -S${SOURCE_DIR} -B${BUILD_DIR} -G Xcode \
     -DCMAKE_TOOLCHAIN_FILE:FILEPATH="${IOS_TOOLCHAIN_FILE}" \
     -DQT_HOST_PATH=${QT_HOST_PATH} \
     -DQT_QML_GENERATE_QMLLS_INI:STRING=ON \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE \
     "-DCMAKE_CXX_FLAGS_DEBUG_INIT:STRING=-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG" \
     "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT:STRING=-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG" \
-    --no-warn-unused-cli \
-    -S${SOURCE_DIR} \
-    -B${BUILD_DIR}
+    --no-warn-unused-cli
+#    -DCMAKE_OSX_SYSROOT:STRING=iphonesimulator
 
-# Build application
+# Move to build folder
 echo "Going to build folder"
-cd "${BUILD_DIR}"
+cd ${BUILD_DIR}
+
 echo "Building application"
-xcodebuild \
+ARCHS="arm64" xcodebuild \
     -project ${APP_NAME}.xcodeproj \
-    -scheme ${APP_NAME} \
-    -sdk iphonesimulator \
+    build -target ALL_BUILD \
+    -parallelizeTargets \
     -configuration ${BUILD_TYPE} \
+    -sdk iphonesimulator18.5 \
+    -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5' \
     CODE_SIGN_IDENTITY="" \
-    CODE_SIGNING_REQUIRED=NO
+    CODE_SIGNING_REQUIRED=NO \
+    CODE_SIGNING_ALLOWED=NO \
+    -jobs 12 \
+    -hideShellScriptEnvironment \
+    -allowProvisioningUpdates
