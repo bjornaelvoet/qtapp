@@ -10,6 +10,8 @@ on:
 
 jobs:
   build-and-deploy:
+    if: false # <--- This line disables the entire workflow
+
     runs-on: macos-15-arm64
 
     steps:

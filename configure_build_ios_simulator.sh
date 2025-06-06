@@ -2,18 +2,17 @@
 
 # Set these variables according to your needs
 APP_NAME="QtApp"
-BUILD_TYPE="Debug"
+BUILD_TYPE_CI="Release"
+BUILD_TYPE_LOCAL="Debug"
 QT_VERSION="6.9.1"
 BUILD_DIR="./build"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
-# This is actually the name of xcode as installed on the github host machine (/Applications/Xcode_XY.Z.app)
-XCODE_VERSION_CI="Xcode_16.4"
-TARGET_SDK_CI="iphonesimulator17.5"
+DEVELOPER_DIR_CI="/Applications/Xcode_16.4.app/Contents/Developer"
+TARGET_SDK_CI="iphonesimulator18.5"
 
-# This is actually the name of xcode as installed on the local machine (/Applications/Xcode.app)
-XCODE_VERSION_LOCAL="Xcode"
+DEVELOPER_DIR_LOCAL="/Applications/Xcode.app/Contents/Developer"
 TARGET_SDK_LOCAL="iphonesimulator18.5"
 
 # Construct helper paths
@@ -27,11 +26,11 @@ if [ "$CI" = "true" ]; then
   echo "Specifically, GITHUB_ACTIONS is: ${GITHUB_ACTIONS}"
   echo "Workflow Name: ${GITHUB_WORKFLOW}"
   echo "Run ID: ${GITHUB_RUN_ID}"
-  XCODE_VERSION=${XCODE_VERSION_CI}
+  DEVELOPER_DIR=${DEVELOPER_DIR_CI}
   TARGET_SDK=${TARGET_SDK_CI}
  else
   echo "This script is NOT running in a CI environment."
-  XCODE_VERSION=${XCODE_VERSION_LOCAL}
+  DEVELOPER_DIR=${DEVELOPER_DIR_LOCAL}
   TARGET_SDK=${TARGET_SDK_LOCAL}
 fi
 
@@ -45,16 +44,8 @@ echo "QT_INSTALL_BASE_DIR: ${QT_INSTALL_BASE_DIR}"
 echo "QT_CMAKE_DIR: ${QT_CMAKE_DIR}"
 echo "QT_HOST_PATH: ${QT_HOST_PATH}"
 echo "IOS_TOOLCHAIN_FILE: ${IOS_TOOLCHAIN_FILE}"
-echo "XCODE_VERSION: ${XCODE_VERSION}"
+echo "DEVELOPER_DIR: ${DEVELOPER_DIR}"
 echo "TARGET_SDK: ${TARGET_SDK}"
-
-# Select the version of xcode
-echo "Following Xcode versions are available"
-ls -F /Applications | grep "Xcode"
-echo "Default Xcode version is"
-xcodebuild -version
-echo "Switching to Xcode version ${XCODE_VERSION}"
-sudo xcode-select --switch /Applications/${XCODE_VERSION}.app/Contents/Developer
 
 # Install cmake if not already installed
 if [ "$CI" = "true" ]; then
@@ -133,7 +124,7 @@ cd ${BUILD_DIR}
 # Make sure the version matches here with the -sdk iphonesimulatorXY.Z in the build command
 echo "Building application"
 echo "Make sure the SDK matches with the installed iOS SDK above"
-xcodebuild \
+DEVELOPER_DIR="${DEVELOPER_DIR}" xcodebuild \
     -project ${APP_NAME}.xcodeproj \
     build -target ALL_BUILD \
     -parallelizeTargets \
@@ -144,4 +135,5 @@ xcodebuild \
     CODE_SIGNING_ALLOWED=NO \
     -jobs 12 \
     -hideShellScriptEnvironment \
-    -allowProvisioningUpdates
+    -allowProvisioningUpdates \
+    ONLY_ACTIVE_ARCH=NO 
