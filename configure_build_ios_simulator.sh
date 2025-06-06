@@ -58,8 +58,8 @@ else
     exit 1 # Fail the workflow if the desired Xcode is not found
 fi
 echo "Current Xcode version"
-xcode-select --print-path
-xcodebuild -version
+DEVELOPER_DIR="${DEVELOPER_DIR}" xcode-select --print-path
+DEVELOPER_DIR="${DEVELOPER_DIR}" xcodebuild -version
 
 # Install cmake if not already installed
 if [ "$CI" = "true" ]; then
