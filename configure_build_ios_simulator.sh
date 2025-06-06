@@ -97,7 +97,7 @@ if [ "$CI" = "true" ]; then
     echo "Show available SDKs"
     xcodebuild -showsdks
     # Note that xcodebuild only downloads the latest SDK available for the intalled Xcode installation
-    echo "Installing iOS SDK"
+    #echo "Installing iOS SDK"
     #xcodebuild -downloadPlatform iOS
 else
     echo "Install necessary iOS SDK if not already installed"
@@ -111,12 +111,12 @@ cd ${BUILD_DIR}
 # Make sure the version matches here with the -sdk iphonesimulatorXY.Z in the build command
 echo "Building application"
 echo "Make sure the SDK matches with the installed iOS SDK above"
-ARCHS="arm64" xcodebuild \
+xcodebuild \
     -project ${APP_NAME}.xcodeproj \
     build -target ALL_BUILD \
     -parallelizeTargets \
     -configuration ${BUILD_TYPE} \
-    -sdk iphonesimulator17.5 \
+    -sdk iphonesimulator18.5 \
     CODE_SIGN_IDENTITY="" \
     CODE_SIGNING_REQUIRED=NO \
     CODE_SIGNING_ALLOWED=NO \
