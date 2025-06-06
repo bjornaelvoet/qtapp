@@ -47,6 +47,20 @@ echo "IOS_TOOLCHAIN_FILE: ${IOS_TOOLCHAIN_FILE}"
 echo "DEVELOPER_DIR: ${DEVELOPER_DIR}"
 echo "TARGET_SDK: ${TARGET_SDK}"
 
+# Check Xcode version is available
+echo "Available Xcode versions"
+ls /Applications | grep "Xcode"
+# Check if the path exists before setting DEVELOPER_DIR
+if [ -d "$DEVELOPER_DIR" ]; then
+    echo "Found Xcode at: $DEVELOPER_DIR"
+else
+    echo "Error: Xcode installation not found at $DEVELOPER_DIR"
+    exit 1 # Fail the workflow if the desired Xcode is not found
+fi
+echo "Current Xcode version"
+xcode-select --print-path
+xcodebuild -version
+
 # Install cmake if not already installed
 if [ "$CI" = "true" ]; then
     echo "Installing cmake"
@@ -102,28 +116,13 @@ cmake -S${SOURCE_DIR} -B${BUILD_DIR} -G Xcode \
     "-DCMAKE_CXX_FLAGS_DEBUG_INIT:STRING=-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG" \
     "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO_INIT:STRING=-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG" \
     --no-warn-unused-cli
-#    -DCMAKE_OSX_SYSROOT:STRING=iphonesimulator
-
-
-# Install iOS SDK
-if [ "$CI" = "true" ]; then
-    echo "Show available SDKs"
-    xcodebuild -showsdks
-    # Note that xcodebuild only downloads the latest SDK available for the intalled Xcode installation
-    #echo "Installing iOS SDK"
-    #xcodebuild -downloadPlatform iOS
-else
-    echo "Install necessary iOS SDK if not already installed"
-fi
 
 # Move to build folder
 echo "Going to build folder"
 cd ${BUILD_DIR}
 
 # Build application
-# Make sure the version matches here with the -sdk iphonesimulatorXY.Z in the build command
 echo "Building application"
-echo "Make sure the SDK matches with the installed iOS SDK above"
 DEVELOPER_DIR="${DEVELOPER_DIR}" xcodebuild \
     -project ${APP_NAME}.xcodeproj \
     build -target ALL_BUILD \
