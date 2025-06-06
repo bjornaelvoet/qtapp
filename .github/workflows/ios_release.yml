@@ -20,7 +20,7 @@ jobs:
       shell: bash
       run: |
         chmod +x ./configure_build_ios.sh
-        ./configure_build_ios.sh
+        ./configure_build_ios_simulator.sh
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
