@@ -8,6 +8,13 @@ BUILD_DIR="./build"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
+# This is actually the name of xcode as installed on the machine (/Applications/Xcode_XY.Z.app)
+XCODE_VERSION_CI="Xcode_16.4"
+TARGET_SDK_CI="iphonesimulator17.5"
+
+XCODE_VERSION_LOCAL="Xcode"
+TARGET_SDK_LOCAL="iphonesimulator18.5"
+
 # Construct helper paths
 QT_CMAKE_DIR="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/ios/lib/cmake"
 QT_HOST_PATH="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/macos"
@@ -19,8 +26,12 @@ if [ "$CI" = "true" ]; then
   echo "Specifically, GITHUB_ACTIONS is: ${GITHUB_ACTIONS}"
   echo "Workflow Name: ${GITHUB_WORKFLOW}"
   echo "Run ID: ${GITHUB_RUN_ID}"
+  XCODE_VERSION=${XCODE_VERSION_CI}
+  TARGET_SDK=${TARGET_SDK_CI}
  else
   echo "This script is NOT running in a CI environment."
+  XCODE_VERSION=${XCODE_VERSION_LOCAL}
+  TARGET_SDK=${TARGET_SDK_LOCAL}
 fi
 
 # Show the environment variables
@@ -33,6 +44,16 @@ echo "QT_INSTALL_BASE_DIR: ${QT_INSTALL_BASE_DIR}"
 echo "QT_CMAKE_DIR: ${QT_CMAKE_DIR}"
 echo "QT_HOST_PATH: ${QT_HOST_PATH}"
 echo "IOS_TOOLCHAIN_FILE: ${IOS_TOOLCHAIN_FILE}"
+echo "XCODE_VERSION: ${XCODE_VERSION}"
+echo "TARGET_SDK: ${TARGET_SDK}"
+
+# Select the version of xcode
+echo "Following Xcode versions are available"
+ls -F /Applications | grep "Xcode"
+echo "Default Xcode version is"
+xcodebuild -version
+echo "Switching to Xcode version ${XCODE_VERSION}"
+sudo xcode-select --switch /Applications/${XCODE_VERSION}.app/Contents/Developer
 
 # Install cmake if not already installed
 if [ "$CI" = "true" ]; then
@@ -83,7 +104,7 @@ cmake -E capabilities
 echo "Configuring cmake"
 cmake -S${SOURCE_DIR} -B${BUILD_DIR} -G Xcode \
     -DCMAKE_TOOLCHAIN_FILE:FILEPATH="${IOS_TOOLCHAIN_FILE}" \
-    -DQT_HOST_PATH=${QT_HOST_PATH} \
+    -DQT_HOST_PATH="${QT_HOST_PATH}" \
     -DQT_QML_GENERATE_QMLLS_INI:STRING=ON \
     -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE \
     "-DCMAKE_CXX_FLAGS_DEBUG_INIT:STRING=-DQT_QML_DEBUG -DQT_DECLARATIVE_DEBUG" \
@@ -116,7 +137,7 @@ xcodebuild \
     build -target ALL_BUILD \
     -parallelizeTargets \
     -configuration ${BUILD_TYPE} \
-    -sdk iphonesimulator18.5 \
+    -sdk ${TARGET_SDK} \
     CODE_SIGN_IDENTITY="" \
     CODE_SIGNING_REQUIRED=NO \
     CODE_SIGNING_ALLOWED=NO \
