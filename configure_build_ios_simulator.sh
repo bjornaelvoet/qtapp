@@ -55,9 +55,9 @@ if [ "$CI" = "true" ]; then
     echo "List of possible Qt modules"
     aqt list-qt mac ios --long-modules 6.9.1 ios
     echo "Installing necessary Qt modules"
-    # The desktop version of qt also needs to be installed for cross-compilation
-    aqt install-qt desktop mac ${QT_VERSION} clang_64 --outputdir ${QT_INSTALL_BASE_DIR} --modules qtquick3d --autodesktop
-    aqt install-qt mac ios ${QT_VERSION} ios --outputdir ${QT_INSTALL_BASE_DIR} --modules qtquick3d --autodesktop
+    # The desktop version of qt also needs to be installed for cross-compilation. Don't use autodesktop option as it installed everything.
+    aqt install-qt mac desktop ${QT_VERSION} clang_64 --outputdir ${QT_INSTALL_BASE_DIR} --modules qtquick3d
+    aqt install-qt mac ios ${QT_VERSION} ios --outputdir ${QT_INSTALL_BASE_DIR} --modules qtquick3d
 else
     echo "Run qt if not already installed"
 fi
