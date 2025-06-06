@@ -8,10 +8,11 @@ BUILD_DIR="./build"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
-# This is actually the name of xcode as installed on the machine (/Applications/Xcode_XY.Z.app)
+# This is actually the name of xcode as installed on the github host machine (/Applications/Xcode_XY.Z.app)
 XCODE_VERSION_CI="Xcode_16.4"
 TARGET_SDK_CI="iphonesimulator17.5"
 
+# This is actually the name of xcode as installed on the local machine (/Applications/Xcode.app)
 XCODE_VERSION_LOCAL="Xcode"
 TARGET_SDK_LOCAL="iphonesimulator18.5"
 
