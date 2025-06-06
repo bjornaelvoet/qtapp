@@ -66,7 +66,7 @@ fi
 echo "Make the build folder if not exist"
 mkdir -p "${BUILD_DIR}"
 
-# RemoveCleaning old CMake build artifacts
+# Cleaning old CMake build artifacts
 if [ "$CI" = "true" ]; then
     echo "No old CMake build artifacts to clean"
 else
@@ -91,10 +91,23 @@ cmake -S${SOURCE_DIR} -B${BUILD_DIR} -G Xcode \
     --no-warn-unused-cli
 #    -DCMAKE_OSX_SYSROOT:STRING=iphonesimulator
 
+
+# Install iOS SDK
+if [ "$CI" = "true" ]; then
+    echo "Show available SDKs"
+    xcodebuild -showsdks
+    # Install iOS SDK, make sure the version matches here with the -sdk iphonesimulatorXY.Z in the build command
+    echo "Installing iOS SDK"
+    xcodebuild -downloadPlatform iOS -buildVersion 18.5
+else
+    echo "Install necessary iOS SDK if not already installed"
+fi
+
 # Move to build folder
 echo "Going to build folder"
 cd ${BUILD_DIR}
 
+# Build application
 echo "Building application"
 ARCHS="arm64" xcodebuild \
     -project ${APP_NAME}.xcodeproj \
