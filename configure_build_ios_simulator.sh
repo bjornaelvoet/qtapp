@@ -96,9 +96,9 @@ cmake -S${SOURCE_DIR} -B${BUILD_DIR} -G Xcode \
 if [ "$CI" = "true" ]; then
     echo "Show available SDKs"
     xcodebuild -showsdks
-    # Install iOS SDK, make sure the version matches here with the -sdk iphonesimulatorXY.Z in the build command
+    # Note that xcodebuild only downloads the latest SDK available for the intalled Xcode installation
     echo "Installing iOS SDK"
-    xcodebuild -downloadPlatform iOS -buildVersion 18.5
+    xcodebuild -downloadPlatform iOS
 else
     echo "Install necessary iOS SDK if not already installed"
 fi
@@ -108,14 +108,16 @@ echo "Going to build folder"
 cd ${BUILD_DIR}
 
 # Build application
+# Make sure the version matches here with the -sdk iphonesimulatorXY.Z in the build command
 echo "Building application"
+echo "Make sure the SDK matches with the installed iOS SDK above"
 ARCHS="arm64" xcodebuild \
     -project ${APP_NAME}.xcodeproj \
     build -target ALL_BUILD \
     -parallelizeTargets \
     -configuration ${BUILD_TYPE} \
-    -sdk iphonesimulator18.5 \
-    -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5' \
+    -sdk iphonesimulator17.5 \
+#    -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=17.5' \
     CODE_SIGN_IDENTITY="" \
     CODE_SIGNING_REQUIRED=NO \
     CODE_SIGNING_ALLOWED=NO \
