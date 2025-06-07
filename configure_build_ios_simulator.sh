@@ -65,8 +65,6 @@ else
     exit 1 # Fail the workflow if the desired Xcode is not found
 fi
 
-# Calculate the full SDK path
-SDK_PATH="${DEVELOPER_DIR}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK}.sdk"
 echo "CMake will use SDK Sysroot: ${SDK_PATH}"
 # Verify the calculated SDK path exists before passing to CMake
 if [ ! -d "$SDK_PATH" ]; then
