@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-deploy:
-    if: false # <--- This line disables the entire workflow
+    #if: false
 
     runs-on: macos-15
 
