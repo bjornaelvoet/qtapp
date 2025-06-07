@@ -11,9 +11,11 @@ QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
 DEVELOPER_DIR_CI="/Applications/Xcode_16.4.app/Contents/Developer"
 TARGET_SDK_CI="iphonesimulator18.5"
+SDK_PATH_CI="${DEVELOPER_DIR_CI}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK_CI}.sdk"
 
 DEVELOPER_DIR_LOCAL="/Applications/Xcode.app/Contents/Developer"
 TARGET_SDK_LOCAL="iphonesimulator18.5"
+SDK_PATH_LOCAL="${DEVELOPER_DIR_LOCAL}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK_LOCAL}.sdk"
 
 # Construct helper paths
 QT_CMAKE_DIR="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/ios/lib/cmake"
@@ -28,11 +30,13 @@ if [ "$CI" = "true" ]; then
   echo "Run ID: ${GITHUB_RUN_ID}"
   export DEVELOPER_DIR=${DEVELOPER_DIR_CI}
   export TARGET_SDK=${TARGET_SDK_CI}
+  SDK_PATH=${SDK_PATH_CI}
   BUILD_TYPE=${BUILD_TYPE_CI}
  else
   echo "This script is NOT running in a CI environment."
   export DEVELOPER_DIR=${DEVELOPER_DIR_LOCAL}
   export TARGET_SDK=${TARGET_SDK_LOCAL}
+  SDK_PATH=${SDK_PATH_LOCAL}
   BUILD_TYPE=${BUILD_TYPE_LOCAL}
 fi
 
@@ -48,6 +52,7 @@ echo "QT_HOST_PATH: ${QT_HOST_PATH}"
 echo "IOS_TOOLCHAIN_FILE: ${IOS_TOOLCHAIN_FILE}"
 echo "DEVELOPER_DIR: ${DEVELOPER_DIR}"
 echo "TARGET_SDK: ${TARGET_SDK}"
+echo "SDK_PATH: ${SDK_PATH}"
 
 # Check Xcode version is available
 echo "Available Xcode versions"
@@ -58,6 +63,16 @@ if [ -d "$DEVELOPER_DIR" ]; then
 else
     echo "Error: Xcode installation not found at $DEVELOPER_DIR"
     exit 1 # Fail the workflow if the desired Xcode is not found
+fi
+
+# Calculate the full SDK path
+SDK_PATH="${DEVELOPER_DIR}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK}.sdk"
+echo "CMake will use SDK Sysroot: ${SDK_PATH}"
+# Verify the calculated SDK path exists before passing to CMake
+if [ ! -d "$SDK_PATH" ]; then
+    echo "Error: The calculated SDK path for CMake does not exist: $SDK_PATH"
+    echo "Please ensure your DEVELOPER_DIR and TARGET_SDK values are correct and the SDK is installed."
+    exit 1
 fi
 
 echo "Current Xcode version"
@@ -108,16 +123,6 @@ fi
 # CMake info
 cmake --version
 cmake -E capabilities
-
-# Calculate the full SDK path for CMAKE_OSX_SYSROOT
-SDK_PATH="${DEVELOPER_DIR}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK}.sdk"
-echo "CMake will use SDK Sysroot: ${SDK_PATH}"
-# Verify the calculated SDK path exists before passing to CMake
-if [ ! -d "$SDK_PATH" ]; then
-    echo "Error: The calculated SDK path for CMake does not exist: $SDK_PATH"
-    echo "Please ensure your DEVELOPER_DIR and TARGET_SDK values are correct and the SDK is installed."
-    exit 1
-fi
 
 # Configure cmake (get example by configuring a dummy project in QTCreator)
 echo "Configuring cmake"
