@@ -2,9 +2,11 @@
 
 # Set these variables according to your needs
 APP_NAME="QtApp.app"
-BUILD_TYPE="Debug"
+BUILD_TYPE_CI="Release"
+BUILD_TYPE_LOCAL="Debug"
 QT_VERSION="6.9.1"
 BUILD_DIR="./build"
+SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
 # Construct helper paths
@@ -17,8 +19,10 @@ if [ "$CI" = "true" ]; then
   echo "Specifically, GITHUB_ACTIONS is: ${GITHUB_ACTIONS}"
   echo "Workflow Name: ${GITHUB_WORKFLOW}"
   echo "Run ID: ${GITHUB_RUN_ID}"
+  BUILD_TYPE=${BUILD_TYPE_CI}
  else
   echo "This script is NOT running in a CI environment."
+  BUILD_TYPE=${BUILD_TYPE_LOCAL}
 fi
 
 # Show the environment variables
@@ -26,9 +30,10 @@ echo "APP_NAME: ${APP_NAME}"
 echo "BUILD_TYPE: ${BUILD_TYPE}"
 echo "QT_VERSION: ${QT_VERSION}"
 echo "BUILD_DIR: ${BUILD_DIR}"
+echo "SOURCE_DIR: ${SOURCE_DIR}"
 echo "QT_INSTALL_BASE_DIR: ${QT_INSTALL_BASE_DIR}"
 echo "QT_CMAKE_DIR: ${QT_CMAKE_DIR}"
-echo "MAC_DEPLOY_QT: ${MAC_DEPLOY_QT}"  
+echo "MAC_DEPLOY_QT: ${MAC_DEPLOY_QT}"
 
 # Install cmake if not already installed
 if [ "$CI" = "true" ]; then
@@ -60,7 +65,7 @@ fi
 echo "Make the build folder if not exist"
 mkdir -p "${BUILD_DIR}"
 
-# RemoveCleaning old CMake build artifacts
+# Cleaning old CMake build artifacts
 if [ "$CI" = "true" ]; then
     echo "No old CMake build artifacts to clean"
 else
@@ -69,17 +74,23 @@ else
     rm -rf "${BUILD_DIR}/CMakeFiles"
 fi
 
-# Configure cmake
-echo "Going to build folder"
-cd "${BUILD_DIR}"
+# CMake info
+cmake --version
+cmake -E capabilities
+
+# Configure cmake (get example by configuring a dummy project in QTCreator)
 echo "Configuring cmake"
-cmake .. -DCMAKE_PREFIX_PATH=${QT_CMAKE_DIR} -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+cmake -S${SOURCE_DIR} -B${BUILD_DIR} \
+    -DCMAKE_PREFIX_PATH=${QT_CMAKE_DIR} \
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+
+# Move to build folder
+echo "Going to build folder"
+cd ${BUILD_DIR}
 
 # Build application
 echo "Building application"
 cmake --build . --config ${BUILD_TYPE}
-
-
 
 # Bundling application
 if [ "$CI" = "true" ]; then
