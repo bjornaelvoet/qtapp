@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     #if: false    
     
     runs-on: ubuntu-24.04
@@ -40,21 +40,53 @@ jobs:
     - name: Build project
       run: cmake --build build --config Release
 
-    - name: Install FUSE (for AppImage)
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y fuse
+    - name: Debug du
+      run: du -h
 
-    - name: Package application (e.g., with linuxdeployqt for Linux)
-      run: |
-        # Download and run linuxdeployqt
-        wget -q -O linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-        chmod +x linuxdeployqt
-        ./linuxdeployqt build/QtApp
-        ./linuxdeployqt build/QtApp --appimage
-
-    - name: Upload Artifact
+    - name: Upload build artifacts (for linuxdeployqt job)
       uses: actions/upload-artifact@v4
       with:
-        name: YourApp-Linux-Build
-        path: build/
+        name: built-app-for-linuxdeployqt
+        # Path to your compiled application executable and any assets it needs
+        path: |
+          build/QtApp
+          # Add any other assets needed for deployment, e.g., your QML files
+          # build/qml
+          # build/assets
+          # ...
+        retention-days: 1
+
+  deploy_appimage:
+    runs-on: ubuntu-22.04
+    needs: build
+
+    steps:
+      - name: Download built app
+        uses: actions/download-artifact@v4
+        with:
+          name: built-app-for-linuxdeployqt
+          path: deploy_stage/
+
+      - name: Install FUSE (for AppImage)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
+      - name: Package application with linuxdeployqt
+        run: |
+          cd deploy_stage/
+          wget -q -O linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+          chmod +x linuxdeployqt
+          
+          # Run linuxdeployqt. The executable is directly in deploy_stage now.
+          # You might need to adjust the path if your build structure was different
+          ./linuxdeployqt QtApp
+          ./linuxdeployqt QtApp --appimage
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QtApp-AppImage
+          # The AppImage is typically created in the same directory as the AppDir
+          # Adjust the name if linuxdeployqt names it differently (e.g., QtApp-x86_64.AppImage)
+          path: deploy_stage/*.AppImage
