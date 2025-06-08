@@ -27,7 +27,7 @@ jobs:
         host: 'linux'
         target: 'desktop'
         arch: 'linux_gcc_64'
-        dir: '${{ env.GITHUB_WORKSPACE }}/qt'
+        dir: '~/qt'
         use-official: false
         modules: 'qtquick3d'
 
