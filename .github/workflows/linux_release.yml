@@ -27,7 +27,7 @@ jobs:
         host: 'linux'
         target: 'desktop'
         arch: 'linux_gcc_64'
-        dir: '~/qt'
+        #dir: '~/qt'
         use-official: false
         modules: 'qtquick3d'
 
@@ -41,7 +41,10 @@ jobs:
       run: cmake --build build --config Release
 
     - name: Debug du
-      run: du -h
+      run: |
+        ls -alh
+        ls -alh ./build
+        du -alh
 
     - name: Upload build artifacts (for linuxdeployqt job)
       uses: actions/upload-artifact@v4
