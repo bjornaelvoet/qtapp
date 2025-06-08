@@ -10,7 +10,7 @@ QT_AQT_TARGET_OS="desktop"
 QT_AQT_ARCH_ARG="clang_64"
 QT_FOLDER_NAME="macOS"
 QT_REQUIRED_MODULES="qtquick3d"
-BUILD_DIR="./build"
+BUILD_DIR="./build_macos"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
