@@ -40,12 +40,6 @@ jobs:
     - name: Build project
       run: cmake --build build --config Release
 
-    - name: Debug du
-      run: |
-        ls -alh
-        ls -alh ./build
-        du -alh
-
     - name: Upload build artifacts (for linuxdeployqt job)
       uses: actions/upload-artifact@v4
       with:
@@ -81,6 +75,8 @@ jobs:
           wget -q -O linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
           chmod +x linuxdeployqt
           
+          ls -alh
+
           # Run linuxdeployqt. The executable is directly in deploy_stage now.
           # You might need to adjust the path if your build structure was different
           ./linuxdeployqt QtApp
@@ -93,3 +89,13 @@ jobs:
           # The AppImage is typically created in the same directory as the AppDir
           # Adjust the name if linuxdeployqt names it differently (e.g., QtApp-x86_64.AppImage)
           path: deploy_stage/*.AppImage
+
+  build_arm64:
+    runs-on: ubuntu-24.04
+    architecture: arm64
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+
