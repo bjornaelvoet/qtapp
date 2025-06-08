@@ -10,18 +10,18 @@ QT_AQT_TARGET_OS="ios"
 QT_AQT_ARCH_ARG="ios"
 QT_FOLDER_NAME="ios"
 QT_REQUIRED_MODULES="qtquick3d"
-BUILD_DIR="./build_ios_simulator"
+BUILD_DIR="./build_ios"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
 # CI specific building
 DEVELOPER_DIR_CI="/Applications/Xcode_16.4.app/Contents/Developer"
-TARGET_SDK_CI="iphonesimulator18.5"
-SDK_PATH_CI="${DEVELOPER_DIR_CI}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK_CI}.sdk"
+TARGET_SDK_CI="iphoneos18.5"
+SDK_PATH_CI="${DEVELOPER_DIR_CI}/Platforms/iPhoneOS.platform/Developer/SDKs/${TARGET_SDK_CI}.sdk"
 # local specific building
 DEVELOPER_DIR_LOCAL="/Applications/Xcode.app/Contents/Developer"
-TARGET_SDK_LOCAL="iphonesimulator18.5"
-SDK_PATH_LOCAL="${DEVELOPER_DIR_LOCAL}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK_LOCAL}.sdk"
+TARGET_SDK_LOCAL="iphoneos18.5"
+SDK_PATH_LOCAL="${DEVELOPER_DIR_LOCAL}/Platforms/iPhoneOS.platform/Developer/SDKs/${TARGET_SDK_LOCAL}.sdk"
 
 # Construct helper paths
 QT_CMAKE_DIR="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/ios/lib/cmake"
