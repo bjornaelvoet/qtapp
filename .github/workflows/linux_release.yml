@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-deploy:
-    if: false    
+    #if: false    
     
     runs-on: ubuntu-24.04
 
