@@ -73,9 +73,7 @@ jobs:
           cd deploy_stage/
           wget -q -O linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
           chmod +x linuxdeployqt
-          
-          ls -alh
-
+          chmod +x QtApp        
           # Run linuxdeployqt. The executable is directly in deploy_stage now.
           # You might need to adjust the path if your build structure was different
           ./linuxdeployqt QtApp
