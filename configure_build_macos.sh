@@ -5,6 +5,8 @@ APP_NAME="QtApp.app"
 BUILD_TYPE_CI="Release"
 BUILD_TYPE_LOCAL="Debug"
 QT_VERSION="6.9.1"
+QT_ARCH="clang_64"
+QT_REQUIRED_MODULES="qtquick3d"
 BUILD_DIR="./build"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
@@ -12,6 +14,9 @@ QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 # Construct helper paths
 QT_CMAKE_DIR="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/macos/lib/cmake"
 MAC_DEPLOY_QT="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/macos/bin/macdeployqt"
+
+# QT helper functions
+source "./qt_installer_functions.sh"
 
 # CI or not
 if [ "$CI" = "true" ]; then
@@ -29,37 +34,35 @@ fi
 echo "APP_NAME: ${APP_NAME}"
 echo "BUILD_TYPE: ${BUILD_TYPE}"
 echo "QT_VERSION: ${QT_VERSION}"
+echo "QT_ARCH: ${QT_ARCH}"
 echo "BUILD_DIR: ${BUILD_DIR}"
 echo "SOURCE_DIR: ${SOURCE_DIR}"
 echo "QT_INSTALL_BASE_DIR: ${QT_INSTALL_BASE_DIR}"
 echo "QT_CMAKE_DIR: ${QT_CMAKE_DIR}"
 echo "MAC_DEPLOY_QT: ${MAC_DEPLOY_QT}"
 
-# Install cmake if not already installed
-if [ "$CI" = "true" ]; then
-    echo "Installing cmake"
+# Check if cmake is already installed
+if ! command -v cmake &> /dev/null; then
+    echo "cmake is not found."
+    echo "Installing cmake via Homebrew..."
     brew update && brew install cmake
 else
-    echo "Install cmake if not already installed"
+    echo "cmake is already installed."
 fi
 
-# Install aqtinstall if not already installed
-if [ "$CI" = "true" ]; then
-    echo "Installing aqtinstall"
+# Check if aqt is already installed
+if ! command -v aqt &> /dev/null; then
+    echo "aqt is not found."
+    echo "Installing aqt via Homebrew..."
     brew update && brew install aqtinstall
 else
-    echo "Install aqtinstall if not already installed"
+    echo "aqt is already installed."
 fi
 
-# Install Qt if not already installed
-if [ "$CI" = "true" ]; then
-    echo "List of possible Qt modules"
-    aqt list-qt mac desktop --long-modules 6.9.1 clang_64
-    echo "Installing necessary Qt modules"
-    aqt install-qt mac desktop ${QT_VERSION} clang_64 --outputdir ${QT_INSTALL_BASE_DIR} --modules qtquick3d
-else
-    echo "Run qt if not already installed"
-fi
+echo "List of possible Qt modules"
+aqt list-qt mac desktop --long-modules ${QT_VERSION} ${QT_ARCH}
+echo "Installing necessary Qt modules"
+check_and_install_qt "${QT_VERSION}" "${QT_ARCH}" "${QT_INSTALL_BASE_DIR}" "${QT_REQUIRED_MODULES}"
 
 # Make the build folder if not exist
 echo "Make the build folder if not exist"
