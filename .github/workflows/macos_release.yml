@@ -28,13 +28,13 @@ jobs:
       run: |
           echo "The output dir variable is: $BUILD_DIR"
           ls -alh
-          ls -alh $BUILD_DIR
+          ls -alh ${{ env.BUILD_DIR }}
 
     - name: Upload MacOS Artifact
       uses: actions/upload-artifact@v4
       with:
         name: qtapp-macos
-        path: $BUILD_DIR/*.dmg
+        path: ${{ env.BUILD_DIR }}/*.dmg
 
     - name: Configure and build for iOS simulator target
       shell: bash
@@ -46,14 +46,14 @@ jobs:
       run: |
           echo "The output dir variable is: $BUILD_DIR"
           ls -alh
-          ls -alh $BUILD_DIR
+          ls -alh ${{ env.BUILD_DIR }}
 
 
     - name: Upload iOS simulator Artifact
       uses: actions/upload-artifact@v4
       with:
         name: qtapp-ios-simulator
-        path: $BUILD_DIR/Release-iphonesimulator/*
+        path: ${{ env.BUILD_DIR }}/Release-iphonesimulator/*
 
     - name: Configure and build for iOS target
       shell: bash
@@ -65,11 +65,11 @@ jobs:
       run: |
           echo "The output dir variable is: $BUILD_DIR"
           ls -alh
-          ls -alh $BUILD_DIR
+          ls -alh ${{ env.BUILD_DIR }}
 
 
     - name: Upload iOS Artifact
       uses: actions/upload-artifact@v4
       with:
         name: qtapp-ios
-        path: $BUILD_DIR/Release-iphoneos/*
+        path: ${{ env.BUILD_DIR }}/Release-iphoneos/*
