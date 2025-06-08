@@ -103,7 +103,7 @@ jobs:
         version: '6.9.1'
         host: 'linux'
         target: 'desktop'
-        arch: 'linux_gcc_64'
+        arch: 'linux_aarch64'
         use-official: false
         modules: 'qtquick3d'
 
