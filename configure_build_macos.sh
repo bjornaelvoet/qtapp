@@ -111,7 +111,7 @@ if [ "$CI" = "true" ]; then
     "${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=.. -dmg
 else
     echo "Bundling application"
-    "${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=..
+    "${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=.. -appstore-compliant
 fi
 
 # We need the build path exposed to github workflow for artefact upload
