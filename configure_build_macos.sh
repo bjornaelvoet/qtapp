@@ -5,7 +5,10 @@ APP_NAME="QtApp.app"
 BUILD_TYPE_CI="Release"
 BUILD_TYPE_LOCAL="Debug"
 QT_VERSION="6.9.1"
-QT_ARCH="clang_64"
+QT_AQT_HOST_PLATFORM="mac"
+QT_AQT_TARGET_OS="desktop"
+QT_AQT_ARCH_ARG="clang_64"
+QT_FOLDER_NAME="macOS"
 QT_REQUIRED_MODULES="qtquick3d"
 BUILD_DIR="./build"
 SOURCE_DIR="."
@@ -34,7 +37,10 @@ fi
 echo "APP_NAME: ${APP_NAME}"
 echo "BUILD_TYPE: ${BUILD_TYPE}"
 echo "QT_VERSION: ${QT_VERSION}"
-echo "QT_ARCH: ${QT_ARCH}"
+echo "QT_AQT_HOST_PLATFORM: ${QT_AQT_HOST_PLATFORM}"
+echo "QT_AQT_TARGET_OS: ${QT_AQT_TARGET_OS}"
+echo "QT_AQT_ARCH_ARG: ${QT_AQT_ARCH_ARG}"
+echo "QT_FOLDER_NAME: ${QT_FOLDER_NAME}"
 echo "BUILD_DIR: ${BUILD_DIR}"
 echo "SOURCE_DIR: ${SOURCE_DIR}"
 echo "QT_INSTALL_BASE_DIR: ${QT_INSTALL_BASE_DIR}"
@@ -59,10 +65,14 @@ else
     echo "aqt is already installed."
 fi
 
-echo "List of possible Qt modules"
-aqt list-qt mac desktop --long-modules ${QT_VERSION} ${QT_ARCH}
 echo "Installing necessary Qt modules"
-check_and_install_qt "${QT_VERSION}" "${QT_ARCH}" "${QT_INSTALL_BASE_DIR}" "${QT_REQUIRED_MODULES}"
+check_and_install_qt "${QT_VERSION}" \
+                     "${QT_AQT_HOST_PLATFORM}" \
+                     "${QT_AQT_TARGET_OS}" \
+                     "${QT_AQT_ARCH_ARG}" \
+                     "${QT_INSTALL_BASE_DIR}" \
+                     "${QT_REQUIRED_MODULES}" \
+                     "${QT_FOLDER_NAME}"
 
 # Make the build folder if not exist
 echo "Make the build folder if not exist"
