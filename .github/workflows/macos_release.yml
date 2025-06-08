@@ -18,14 +18,38 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Configure and build
+    - name: Configure and build for MacOS target
       shell: bash
       run: |
         chmod +x ./configure_build_macos.sh
         ./configure_build_macos.sh
 
-    - name: Upload Artifact
+    - name: Upload MacOS Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ios-qtapp
-        path: build/*.dmg       
+        name: qtapp-macos
+        path: build/*.dmg
+
+    - name: Configure and build for iOS simulator target
+      shell: bash
+      run: |
+        chmod +x ./configure_build_ios_simulator.sh
+        ./configure_build_ios_simulator.sh
+
+    - name: Upload iOS simulator Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qtapp-ios-simulator
+        path: build/Release-iphonesimulator/*
+
+    - name: Configure and build for iOS target
+      shell: bash
+      run: |
+        chmod +x ./configure_build_ios.sh
+        ./configure_build_ios.sh
+
+    - name: Upload iOS Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qtapp-ios
+        path: build/Release-iphoneos/*
