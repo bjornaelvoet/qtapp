@@ -26,7 +26,7 @@ set (APP_SOURCES_QML
 
 # Define the app qml files
 set (APP_QML_FILES
-    Main.qml
+    main.qml
     Hexagon.qml
 )
 
