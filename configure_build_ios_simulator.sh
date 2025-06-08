@@ -115,7 +115,7 @@ check_and_install_qt "${QT_VERSION}" \
                      "${QT_AQT_ARCH_ARG}" \
                      "${QT_INSTALL_BASE_DIR}" \
                      "${QT_REQUIRED_MODULES}" \
-                     "${QT_FOLDER_NAME}"# Make the build folder if not exist
+                     "${QT_FOLDER_NAME}"
 
 # Make the build folder if not exist
 echo "Make the build folder if not exist"
