@@ -14,10 +14,11 @@ BUILD_DIR="./build"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
+# CI specific building
 DEVELOPER_DIR_CI="/Applications/Xcode_16.4.app/Contents/Developer"
 TARGET_SDK_CI="iphonesimulator18.5"
 SDK_PATH_CI="${DEVELOPER_DIR_CI}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK_CI}.sdk"
-
+# local specific building
 DEVELOPER_DIR_LOCAL="/Applications/Xcode.app/Contents/Developer"
 TARGET_SDK_LOCAL="iphonesimulator18.5"
 SDK_PATH_LOCAL="${DEVELOPER_DIR_LOCAL}/Platforms/iPhoneSimulator.platform/Developer/SDKs/${TARGET_SDK_LOCAL}.sdk"
@@ -52,8 +53,11 @@ fi
 echo "APP_NAME: ${APP_NAME}"
 echo "BUILD_TYPE: ${BUILD_TYPE}"
 echo "QT_VERSION: ${QT_VERSION}"
-echo "QT_AQT_PLATFORM_ARG: ${QT_AQT_PLATFORM_ARG}"
+echo "QT_AQT_HOST_PLATFORM: ${QT_AQT_HOST_PLATFORM}"
+echo "QT_AQT_TARGET_OS: ${QT_AQT_TARGET_OS}"
 echo "QT_AQT_ARCH_ARG: ${QT_AQT_ARCH_ARG}"
+echo "QT_FOLDER_NAME: ${QT_FOLDER_NAME}"
+echo "BUILD_DIR: ${BUILD_DIR}"
 echo "SOURCE_DIR: ${SOURCE_DIR}"
 echo "QT_INSTALL_BASE_DIR: ${QT_INSTALL_BASE_DIR}"
 echo "QT_CMAKE_DIR: ${QT_CMAKE_DIR}"
@@ -71,7 +75,7 @@ if [ -d "$DEVELOPER_DIR" ]; then
     echo "Found Xcode at: $DEVELOPER_DIR"
 else
     echo "Error: Xcode installation not found at $DEVELOPER_DIR"
-    exit 1 # Fail the workflow if the desired Xcode is not found
+    exit 1
 fi
 
 echo "CMake will use SDK Sysroot: ${SDK_PATH}"
@@ -104,10 +108,15 @@ else
     echo "aqt is already installed."
 fi
 
-echo "List of possible Qt modules"
-aqt list-qt mac desktop --long-modules ${QT_VERSION} ${QT_ARCH}
 echo "Installing necessary Qt modules"
-check_and_install_qt "${QT_VERSION}" "${QT_AQT_PLATFORM_ARG}" "${QT_AQT_ARCH_ARG}" "${QT_INSTALL_BASE_DIR}" "${QT_REQUIRED_MODULES}"
+check_and_install_qt "${QT_VERSION}" \
+                     "${QT_AQT_HOST_PLATFORM}" \
+                     "${QT_AQT_TARGET_OS}" \
+                     "${QT_AQT_ARCH_ARG}" \
+                     "${QT_INSTALL_BASE_DIR}" \
+                     "${QT_REQUIRED_MODULES}" \
+                     "${QT_FOLDER_NAME}"# Make the build folder if not exist
+
 # Make the build folder if not exist
 echo "Make the build folder if not exist"
 mkdir -p "${BUILD_DIR}"

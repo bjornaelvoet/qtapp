@@ -14,12 +14,13 @@ BUILD_DIR="./build"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
+# CI specific building
 DEVELOPER_DIR_CI="/Applications/Xcode_16.4.app/Contents/Developer"
-TARGET_SDK_CI="iphoneOS18.5"
+TARGET_SDK_CI="iphoneos18.5"
 SDK_PATH_CI="${DEVELOPER_DIR_CI}/Platforms/iPhoneOS.platform/Developer/SDKs/${TARGET_SDK_CI}.sdk"
-
+# local specific building
 DEVELOPER_DIR_LOCAL="/Applications/Xcode.app/Contents/Developer"
-TARGET_SDK_LOCAL="iPhoneOS18.5"
+TARGET_SDK_LOCAL="iphoneos18.5"
 SDK_PATH_LOCAL="${DEVELOPER_DIR_LOCAL}/Platforms/iPhoneOS.platform/Developer/SDKs/${TARGET_SDK_LOCAL}.sdk"
 
 # Construct helper paths
@@ -74,7 +75,7 @@ if [ -d "$DEVELOPER_DIR" ]; then
     echo "Found Xcode at: $DEVELOPER_DIR"
 else
     echo "Error: Xcode installation not found at $DEVELOPER_DIR"
-    exit 1 # Fail the workflow if the desired Xcode is not found
+    exit 1
 fi
 
 echo "CMake will use SDK Sysroot: ${SDK_PATH}"
@@ -107,8 +108,6 @@ else
     echo "aqt is already installed."
 fi
 
-echo "List of possible Qt modules"
-aqt list-qt mac desktop --long-modules ${QT_VERSION} ${QT_ARCH}
 echo "Installing necessary Qt modules"
 check_and_install_qt "${QT_VERSION}" \
                      "${QT_AQT_HOST_PLATFORM}" \
