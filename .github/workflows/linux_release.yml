@@ -29,7 +29,7 @@ jobs:
         arch: 'linux_gcc_64'
         dir: '${{ env.GITHUB_WORKSPACE }}/qt'
         use-official: false
-        modules: 'quick3d'
+        modules: 'qtquick3d'
 
     - name: Configure CMake
       run: |
