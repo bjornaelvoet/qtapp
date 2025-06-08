@@ -40,13 +40,18 @@ jobs:
     - name: Build project
       run: cmake --build build --config Release
 
+    - name: Install FUSE (for AppImage)
+      run: |
+        apt-get update
+        apt-get install -y fuse
+
     - name: Package application (e.g., with linuxdeployqt for Linux)
       run: |
         # Download and run linuxdeployqt
         wget -q -O linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         chmod +x linuxdeployqt
         ./linuxdeployqt build/QtApp
-        ./linuxdeployqt build/QtApp --appimage # To create an AppImage
+        ./linuxdeployqt build/QtApp --appimage
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
