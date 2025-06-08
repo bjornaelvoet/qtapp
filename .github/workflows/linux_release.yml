@@ -1,0 +1,55 @@
+name: Linux Release
+
+on:
+  push:
+    branches: [ "main","develop"]
+  pull_request:
+    branches: [ "main","develop" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    if: false    
+    
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up CMake
+      uses: lukka/get-cmake@v4.0.2
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.9.1'
+        host: 'linux'
+        target: 'desktop'
+        arch: 'linux_gcc_64'
+        dir: '${ env.GITHUB_WORKSPACE }/qt'
+        use-official: false
+        modules: 'quick3d'
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cmake -S . -B build \
+          -DCMAKE_PREFIX_PATH=./Qt/6.9.1/gcc_64/lib/cmake
+
+    - name: Build project
+      run: cmake --build build --config Release
+
+    - name: Package application (e.g., with linuxdeployqt for Linux)
+      run: |
+        # Download and run linuxdeployqt
+        wget -q -O linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+        chmod +x linuxdeployqt
+        ./linuxdeployqt build/QtApp
+        ./linuxdeployqt build/QtApp --appimage # To create an AppImage
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: YourApp-Linux-Build
+        path: build/
