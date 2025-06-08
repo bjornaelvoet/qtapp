@@ -28,7 +28,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: qtapp-macos
-        path: build/*.dmg
+        path: $BUILD_DIR/*.dmg
 
     - name: Configure and build for iOS simulator target
       shell: bash
@@ -40,7 +40,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: qtapp-ios-simulator
-        path: build/Release-iphonesimulator/*
+        path: $BUILD_DIR/Release-iphonesimulator/*
 
     - name: Configure and build for iOS target
       shell: bash
@@ -52,4 +52,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: qtapp-ios
-        path: build/Release-iphoneos/*
+        path: $BUILD_DIR/Release-iphoneos/*

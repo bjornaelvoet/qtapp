@@ -167,3 +167,8 @@ xcodebuild \
     ONLY_ACTIVE_ARCH=NO
 
 echo "Xcode build command completed."
+
+# We need the build path exposed to github workflow for artefact upload
+if [ "$CI" = "true" ]; then
+    echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
+fi

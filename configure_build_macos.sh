@@ -113,3 +113,8 @@ else
     echo "Bundling application"
     "${MAC_DEPLOY_QT}" ${APP_NAME} -qmldir=..
 fi
+
+# We need the build path exposed to github workflow for artefact upload
+if [ "$CI" = "true" ]; then
+    echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
+fi
