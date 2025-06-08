@@ -27,7 +27,6 @@ jobs:
         host: 'linux'
         target: 'desktop'
         arch: 'linux_gcc_64'
-        #dir: '~/qt'
         use-official: false
         modules: 'qtquick3d'
 
@@ -91,11 +90,43 @@ jobs:
           path: deploy_stage/*.AppImage
 
   build_arm64:
-    runs-on: ubuntu-24.04
-    architecture: arm64
+    runs-on: ubuntu-24.04-arm
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Set up CMake
+      uses: lukka/get-cmake@v4.0.2
 
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.9.1'
+        host: 'linux'
+        target: 'desktop'
+        arch: 'linux_gcc_64'
+        use-official: false
+        modules: 'qtquick3d'
+
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cmake -S . -B build \
+          -DCMAKE_PREFIX_PATH=./Qt/6.9.1/gcc_64/lib/cmake
+
+    - name: Build project
+      run: cmake --build build --config Release
+
+    - name: Upload build artifacts (for linuxdeployqt job)
+      uses: actions/upload-artifact@v4
+      with:
+        name: built-app-for-linuxdeployqt
+        # Path to your compiled application executable and any assets it needs
+        path: |
+          build/QtApp
+          # Add any other assets needed for deployment, e.g., your QML files
+          # build/qml
+          # build/assets
+          # ...
+        retention-days: 1
