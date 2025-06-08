@@ -116,5 +116,5 @@ fi
 
 # We need the build path exposed to github workflow for artefact upload
 if [ "$CI" = "true" ]; then
-    echo "BUILD_DIR=$BUILD_DIR" >> $GITHUB_ENV
+    echo "BUILD_DIR=${BUILD_DIR##./}" >> $GITHUB_ENV
 fi
