@@ -45,7 +45,7 @@ jobs:
 
         echo "Creating Flatpak bundle for distribution..."
         # Use matrix.bundle_suffix for distinct bundle names
-        flatpak build-bundle --user ./repo be.aelvoetnet.QtApp-${{ matrix.bundle_suffix }}.flatpak be.aelvoetnet.QtApp master
+        flatpak build-bundle ./repo be.aelvoetnet.QtApp-${{ matrix.bundle_suffix }}.flatpak be.aelvoetnet.QtApp master
 
     - name: Upload Flatpak bundle (${{ matrix.arch }})
       uses: actions/upload-artifact@v4
