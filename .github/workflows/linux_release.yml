@@ -67,7 +67,6 @@ jobs:
     - name: Set up Flatpak remotes
       run: |
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-        sudo flatpak remote-add --if-not-exists kdeapps https://sdk.kde.org/kdeapps.flatpakrepo
 
     - name: Flatpak build
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
