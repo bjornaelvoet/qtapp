@@ -111,7 +111,7 @@ jobs:
       run: |
         mkdir build
         cmake -S . -B build \
-          -DCMAKE_PREFIX_PATH=./Qt/6.9.1/gcc_64/lib/cmake
+          -DCMAKE_PREFIX_PATH=./Qt/6.9.1/gcc_arm64/lib/cmake
 
     - name: Build project
       run: cmake --build build --config Release
