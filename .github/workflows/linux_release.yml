@@ -59,6 +59,11 @@ jobs:
         use-official: false
         modules: 'qtquick3d'
 
+    - name: Install Flatpak and Flatpak Builder (Manual)
+      run: |
+        sudo apt update
+        sudo apt install -y flatpak flatpak-builder
+
     - name: Flatpak build
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
