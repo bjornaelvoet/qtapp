@@ -72,7 +72,7 @@ jobs:
         sudo flatpak-builder \
           --user \
           --force-clean \
-          --repo=./repo
+          --repo=./repo \
           flatpak_app \
           configure_build_deploy_linux.sh
         ls -alh
