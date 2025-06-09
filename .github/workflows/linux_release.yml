@@ -17,28 +17,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Flatpak and build (arm64)
-      run: |
-        echo "Updating apt and installing Flatpak components..."
-        #sudo apt update
-        sudo apt install -y flatpak flatpak-builder
-
-        echo "Setting up Flatpak remotes..."
-        flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
-        echo "Installing SDK"
-        flatpak install --user -y flathub org.kde.Sdk 6.9
-        flatpak install --user -y flathub org.kde.Platform 6.9
-
-        echo "Starting Flatpak build for ARM64..."
-        sudo flatpak-builder \
-          --user \
-          --force-clean \
-          --repo=./repo \
-          flatpak_app \
-          configure_build_deploy_linux.yml
-        ls -alh
-
     - name: Set up CMake
       uses: lukka/get-cmake@v4.0.2
 
@@ -67,6 +45,28 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    - name: Setup Flatpak and build (arm64)
+      run: |
+        echo "Updating apt and installing Flatpak components..."
+        #sudo apt update
+        sudo apt install -y flatpak flatpak-builder
+
+        echo "Setting up Flatpak remotes..."
+        flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+        echo "Installing SDK"
+        flatpak install --user -y flathub org.kde.Sdk 6.9
+        flatpak install --user -y flathub org.kde.Platform 6.9
+
+        echo "Starting Flatpak build for ARM64..."
+        sudo flatpak-builder \
+          --user \
+          --force-clean \
+          --repo=./repo \
+          flatpak_app \
+          configure_build_deploy_linux.yml
+        ls -alh
 
     - name: Set up CMake
       uses: lukka/get-cmake@v4.0.2
