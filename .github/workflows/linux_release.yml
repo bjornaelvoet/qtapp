@@ -49,7 +49,7 @@ jobs:
     - name: Setup Flatpak and build (arm64)
       run: |
         echo "Updating apt and installing Flatpak components..."
-        #sudo apt update
+        sudo apt update
         sudo apt install -y flatpak flatpak-builder
 
         echo "Setting up Flatpak remotes..."
