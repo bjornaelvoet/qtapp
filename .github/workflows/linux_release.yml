@@ -101,9 +101,9 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         version: '6.9.1'
-        host: 'linux'
+        host: 'linux_arm64'
         target: 'desktop'
-        arch: 'linux_aarch64'
+        arch: 'linux_gcc_arm64'
         use-official: false
         modules: 'qtquick3d'
 
