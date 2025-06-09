@@ -39,55 +39,7 @@ jobs:
     - name: Build project
       run: cmake --build build --config Release
 
-    - name: Upload build artifacts (for linuxdeployqt job)
-      uses: actions/upload-artifact@v4
-      with:
-        name: built-app-for-linuxdeployqt
-        # Path to your compiled application executable and any assets it needs
-        path: |
-          build/QtApp
-          # Add any other assets needed for deployment, e.g., your QML files
-          # build/qml
-          # build/assets
-          # ...
-        retention-days: 1
-
-  deploy_appimage:
-    runs-on: ubuntu-22.04
-    needs: build
-
-    steps:
-      - name: Download built app
-        uses: actions/download-artifact@v4
-        with:
-          name: built-app-for-linuxdeployqt
-          path: deploy_stage/
-
-      - name: Install FUSE (for AppImage)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfuse2
-
-      - name: Package application with linuxdeployqt
-        run: |
-          cd deploy_stage/
-          wget -q -O linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-          chmod +x linuxdeployqt
-          chmod +x QtApp        
-          # Run linuxdeployqt. The executable is directly in deploy_stage now.
-          # You might need to adjust the path if your build structure was different
-          ./linuxdeployqt QtApp
-          ./linuxdeployqt QtApp --appimage
-
-      - name: Upload AppImage artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: QtApp-AppImage
-          # The AppImage is typically created in the same directory as the AppDir
-          # Adjust the name if linuxdeployqt names it differently (e.g., QtApp-x86_64.AppImage)
-          path: deploy_stage/*.AppImage
-
-  build_arm64:
+  build_flatpak_arm64:
     runs-on: ubuntu-24.04-arm
 
     steps:
@@ -107,24 +59,15 @@ jobs:
         use-official: false
         modules: 'qtquick3d'
 
-    - name: Configure CMake
-      run: |
-        mkdir build
-        cmake -S . -B build \
-          -DCMAKE_PREFIX_PATH=./Qt/6.9.1/gcc_arm64/lib/cmake
+    - name: Flatpak build
+      uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+          bundle: qtapp.flatpak
+          manifest-path: configure_build_deploy_linux.yml
+          cache-key: flatpak-builder-${{ github.sha }}
 
-    - name: Build project
-      run: cmake --build build --config Release
-
-    - name: Upload build artifacts (for linuxdeployqt job)
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: built-app-for-linuxarm64deployqt
-        # Path to your compiled application executable and any assets it needs
-        path: |
-          build/QtApp
-          # Add any other assets needed for deployment, e.g., your QML files
-          # build/qml
-          # build/assets
-          # ...
-        retention-days: 1
+          name: qtapp-flatpak-bundle
+          path: qtapp.flatpak
