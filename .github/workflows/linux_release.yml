@@ -119,7 +119,7 @@ jobs:
     - name: Upload build artifacts (for linuxdeployqt job)
       uses: actions/upload-artifact@v4
       with:
-        name: built-app-for-linuxdeployqt
+        name: built-app-for-linuxarm64deployqt
         # Path to your compiled application executable and any assets it needs
         path: |
           build/QtApp
