@@ -66,25 +66,12 @@ jobs:
           --repo=./repo \
           flatpak_app \
           configure_build_deploy_linux.yml
-        ls -alh
 
-    - name: Set up CMake
-      uses: lukka/get-cmake@v4.0.2
+        echo "Creating Flatpak bundle for distribution..."
+        flatpak build-bundle --user ./repo be.aelvoetnet.QtApp-arm64.flatpak be.aelvoetnet.QtApp master
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: '6.9.1'
-        host: 'linux_arm64'
-        target: 'desktop'
-        arch: 'linux_gcc_arm64'
-        use-official: false
-        modules: 'qtquick3d'
-
-
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-          name: qtapp-flatpak-bundle
-          path: qtapp.flatpak
+    - name: Upload Flatpak ARM64 bundle
+    uses: actions/upload-artifact@v4
+    with:
+      name: qtapp-flatpak-arm64-bundle
+      path: be.aelvoetnet.QtApp-arm64.flatpak
