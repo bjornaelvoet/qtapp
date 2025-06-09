@@ -10,9 +10,13 @@ on:
 
 jobs:
   build-and-deploy:
-    #if: false
+    if: false
 
     runs-on: macos-15
+
+    env:
+      # Default build dir. Will be overwritten by the configure build scripts.
+      BUILD_DIR: "build"
 
     steps:
     - name: Checkout repository

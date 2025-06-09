@@ -1,0 +1,55 @@
+name: Linux Release
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
+
+jobs:
+  build_flatpak: # Consolidated Flatpak build job
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        # Define the different configurations for your Flatpak builds
+        include:
+          - runner: ubuntu-24.04-arm
+            arch: aarch64
+            bundle_suffix: arm64
+          - runner: ubuntu-24.04
+            arch: x86_64
+            bundle_suffix: amd64
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Flatpak and Build (${{ matrix.arch }})
+      run: |
+        echo "Updating apt and installing Flatpak components..."
+        sudo apt update
+        sudo apt install -y flatpak flatpak-builder
+
+        echo "Setting up Flatpak remotes (user mode)..."
+        flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+        echo "Updating Flatpak remotes for user..."
+        flatpak update --user
+
+        echo "Explicitly installing Flatpak SDK and Runtime (user mode) for ${{ matrix.arch }}..."
+        flatpak install --user -y flathub org.kde.Sdk/${{ matrix.arch }}/6.9 org.kde.Platform/${{ matrix.arch }}/6.9
+
+        echo "Starting Flatpak build for ${{ matrix.arch }} (user mode)..."
+        flatpak-builder --user --force-clean --repo=./repo app_flatpak configure_build_deploy_linux.yml --arch=${{ matrix.arch }}
+
+        echo "Creating Flatpak bundle for distribution..."
+        # Use matrix.bundle_suffix for distinct bundle names
+        flatpak build-bundle ./repo be.aelvoetnet.QtApp-${{ matrix.bundle_suffix }}.flatpak be.aelvoetnet.QtApp master
+
+    - name: Upload Flatpak bundle (${{ matrix.arch }})
+      uses: actions/upload-artifact@v4
+      with:
+          # Use matrix.bundle_suffix for distinct artifact names and paths
+          name: qtapp-flatpak-${{ matrix.bundle_suffix }}-bundle
+          path: be.aelvoetnet.QtApp-${{ matrix.bundle_suffix }}.flatpak

@@ -1,0 +1,50 @@
+# configure_build_deploy_linux.yml
+# Flatpak manifest for your QtApp
+
+app-id: be.aelvoetnet.QtApp
+runtime: org.kde.Platform
+runtime-version: "6.9"
+sdk: org.kde.Sdk
+command: QtApp
+
+build-options:
+  - --env=CCACHE_DIR=/var/tmp/ccache
+  - --env=CCACHE_COMPRESS=1
+  - --env=CCACHE_MAXSIZE=10G
+  - --env=PATH=/usr/lib/ccache/bin:/usr/bin
+  - --env=CCACHE_NLEVELS=2
+
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --device=dri
+  - --share=network
+  # Optional: Only add if your app needs broad access to user files. Be specific if possible.
+  # For example, use xdg-documents, xdg-pictures, etc., instead of home.
+  # - --filesystem=home
+
+modules:
+  - name: qtapp
+    builddir: true
+
+    sources:
+      - type: dir
+        path: .
+
+    buildsystem: cmake
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/app
+      - -DCMAKE_PREFIX_PATH=/usr
+
+    build-commands:
+      - cmake --build .
+      - cmake --install .
+
+    # This key MUST be at the same indentation level as 'buildsystem', 'config-opts', 'build-commands'
+    install-commands:
+      # Use your actual app-id for the desktop file and icon names as a best practice
+      - install -Dm644 ${FLATPAK_BUILDER_BUILDDIR}/QtApp.desktop /app/share/applications/be.aelvoetnet.QtApp.desktop
+      - install -Dm644 ${FLATPAK_BUILDER_BUILDDIR}/QtApp.png /app/share/icons/hicolor/256x256/apps/be.aelvoetnet.QtApp.png
