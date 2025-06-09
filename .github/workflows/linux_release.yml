@@ -71,9 +71,10 @@ jobs:
     - name: Flatpak build
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
-          bundle: qtapp.flatpak
+          bundle: qtapp_arm64.flatpak
           manifest-path: configure_build_deploy_linux.yml
-          cache-key: flatpak-builder-${{ github.sha }}
+          cache-key: flatpak-builder-arm64-${{ github.sha }}
+          user: true
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
