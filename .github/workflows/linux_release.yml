@@ -60,7 +60,7 @@ jobs:
         flatpak install --user --arch=aarch64 -y flathub org.kde.Platform 6.9
 
         echo "Starting Flatpak build for ARM64..."
-        sudo flatpak-builder \
+        flatpak-builder \
           --user \
           --force-clean \
           --repo=./repo \
