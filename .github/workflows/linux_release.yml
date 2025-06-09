@@ -59,22 +59,23 @@ jobs:
         use-official: false
         modules: 'qtquick3d'
 
-    - name: Install Flatpak and Flatpak Builder (Manual)
+    - name: Setup Flatpak and build (arm64)
       run: |
+        echo "Updating apt and installing Flatpak components..."
         sudo apt update
         sudo apt install -y flatpak flatpak-builder
 
-    - name: Set up Flatpak remotes
-      run: |
+        echo "Setting up Flatpak remotes..."
         sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-    - name: Flatpak build
-      uses: flatpak/flatpak-github-actions/flatpak-builder@v6
-      with:
-          bundle: qtapp_arm64.flatpak
-          manifest-path: configure_build_deploy_linux.yml
-          cache-key: flatpak-builder-arm64-${{ github.sha }}
-          user: true
+        echo "Starting Flatpak build for ARM64..."
+        sudo flatpak-builder \
+          --user \
+          --force-clean \
+          --repo=./repo
+          flatpak_app \
+          configure_build_deploy_linux.sh
+        ls -alh
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
