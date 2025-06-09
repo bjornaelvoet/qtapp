@@ -2,76 +2,54 @@ name: Linux Release
 
 on:
   push:
-    branches: [ "main","develop"]
+    branches: [ "main", "develop" ]
   pull_request:
-    branches: [ "main","develop" ]
+    branches: [ "main", "develop" ]
   workflow_dispatch:
 
 jobs:
-  build:
-    #if: false    
-    
-    runs-on: ubuntu-24.04
+  build_flatpak: # Consolidated Flatpak build job
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        # Define the different configurations for your Flatpak builds
+        include:
+          - runner: ubuntu-24.04-arm
+            arch: aarch64
+            bundle_suffix: arm64
+          - runner: ubuntu-24.04
+            arch: x86_64
+            bundle_suffix: amd64
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up CMake
-      uses: lukka/get-cmake@v4.0.2
-
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: '6.9.1'
-        host: 'linux'
-        target: 'desktop'
-        arch: 'linux_gcc_64'
-        use-official: false
-        modules: 'qtquick3d'
-
-    - name: Configure CMake
-      run: |
-        mkdir build
-        cmake -S . -B build \
-          -DCMAKE_PREFIX_PATH=./Qt/6.9.1/gcc_64/lib/cmake
-
-    - name: Build project
-      run: cmake --build build --config Release
-
-  build_flatpak_arm64:
-    runs-on: ubuntu-24.04-arm
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Flatpak and build (arm64)
+    - name: Setup Flatpak and Build (${{ matrix.arch }})
       run: |
         echo "Updating apt and installing Flatpak components..."
         sudo apt update
         sudo apt install -y flatpak flatpak-builder
 
-        echo "Setting up Flatpak remotes..."
+        echo "Setting up Flatpak remotes (user mode)..."
         flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-        echo "Installing SDK"
-        flatpak install --user --arch=aarch64 -y flathub org.kde.Sdk 6.9
-        flatpak install --user --arch=aarch64 -y flathub org.kde.Platform 6.9
+        echo "Updating Flatpak remotes for user..."
+        flatpak update --user
 
-        echo "Starting Flatpak build for ARM64..."
-        flatpak-builder \
-          --user \
-          --force-clean \
-          --repo=./repo \
-          flatpak_app \
-          configure_build_deploy_linux.yml
+        echo "Explicitly installing Flatpak SDK and Runtime (user mode) for ${{ matrix.arch }}..."
+        flatpak install --user -y flathub org.kde.Sdk/${{ matrix.arch }}/6.9 org.kde.Platform/${{ matrix.arch }}/6.9
+
+        echo "Starting Flatpak build for ${{ matrix.arch }} (user mode)..."
+        flatpak-builder --user --force-clean --repo=./repo app_flatpak configure_build_deploy_linux.yml --arch=${{ matrix.arch }}
 
         echo "Creating Flatpak bundle for distribution..."
-        flatpak build-bundle --user ./repo be.aelvoetnet.QtApp-arm64.flatpak be.aelvoetnet.QtApp master
+        # Use matrix.bundle_suffix for distinct bundle names
+        flatpak build-bundle --user ./repo be.aelvoetnet.QtApp-${{ matrix.bundle_suffix }}.flatpak be.aelvoetnet.QtApp master
 
-    - name: Upload Flatpak ARM64 bundle
-    uses: actions/upload-artifact@v4
-    with:
-      name: qtapp-flatpak-arm64-bundle
-      path: be.aelvoetnet.QtApp-arm64.flatpak
+    - name: Upload Flatpak bundle (${{ matrix.arch }})
+      uses: actions/upload-artifact@v4
+      with:
+          # Use matrix.bundle_suffix for distinct artifact names and paths
+          name: qtapp-flatpak-${{ matrix.bundle_suffix }}-bundle
+          path: be.aelvoetnet.QtApp-${{ matrix.bundle_suffix }}.flatpak
