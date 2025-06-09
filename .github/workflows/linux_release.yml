@@ -56,8 +56,8 @@ jobs:
         flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
         echo "Installing SDK"
-        flatpak install --user -y flathub org.kde.Sdk 6.9
-        flatpak install --user -y flathub org.kde.Platform 6.9
+        flatpak install --user -y flathub org.kde.Sdk/aarch64/6.9
+        flatpak install --user -y flathub org.kde.Platform/aarch64/6.9
 
         echo "Starting Flatpak build for ARM64..."
         sudo flatpak-builder \
