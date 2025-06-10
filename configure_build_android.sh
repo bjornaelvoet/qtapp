@@ -14,9 +14,10 @@ BUILD_DIR="./build_android"
 SOURCE_DIR="."
 QT_INSTALL_BASE_DIR="${HOME}/Qt2"
 
+
 # Android SDK stuff
-ANDROID_SDK_PATH="/Users/bjorn_aelvoet/AndroidSDK"
-ANDROID_NDK_PATH="/Users/bjorn_aelvoet/AndroidSDK/ndk/26.1.10909125"
+ANDROID_SDK_PATH="${HOME}/AndroidSDK"
+ANDROID_NDK_PATH="${HOME}/AndroidSDK/ndk/26.1.10909125"
 ANDROID_TOOLCHAIN_FILE="${ANDROID_NDK_PATH}/build/cmake/android.toolchain.cmake"
 ANDROID_ABI="arm64-v8a"
 
@@ -27,6 +28,8 @@ QT_ANDROID_TOOLCHAIN_FILE="${QT_INSTALL_BASE_DIR}/${QT_VERSION}/android_arm64_v8
 
 # QT helper functions
 source "./qt_installer_functions.sh"
+# Android SDK helper functions
+source "./android_sdk_functions.sh"
 
 # CI or not
 if [ "$CI" = "true" ]; then
@@ -82,6 +85,22 @@ else
     echo "aqt is already installed."
 fi
 
+# Check if sdkmanager is already installed
+if ! command -v sdkmanager &> /dev/null; then
+    echo "sdkmanager is not found."
+    echo "Installing sdkmanager via Homebrew..."
+    brew update && brew install sdkmanager
+else
+    echo "sdkmanager is already installed."
+fi
+
+# Install all Android SDK dependenies
+echo "Installing Android SDK dependencies"
+check_and_install_android_sdk "${ANDROID_SDK_PATH}" "platforms;android-36"
+check_and_install_android_sdk "${ANDROID_SDK_PATH}" "build-tools;36.0.0"
+check_and_install_android_sdk "${ANDROID_SDK_PATH}" "ndk;26.1.10909125"
+
+# Install all necessary Qt modules
 echo "Installing necessary Qt modules"
 check_and_install_qt "${QT_VERSION}" \
                      "${QT_AQT_HOST_PLATFORM}" \
@@ -105,14 +124,12 @@ else
 fi
 
 # CMake info
+echo "CMake info"
 cmake --version
 cmake -E capabilities
 
 # Configure cmake (get example by configuring a dummy project in QTCreator)
 echo "Configuring cmake"
-
-echo "TOOLCHAIN FILE: ${ANDROID_TOOLCHAIN_FILE}"
-
 cmake -S${SOURCE_DIR} -B${BUILD_DIR} \
     -DCMAKE_PREFIX_PATH="${QT_CMAKE_DIR}" \
     -DCMAKE_MODULE_PATH="${QT_CMAKE_DIR}" \
