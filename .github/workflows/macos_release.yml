@@ -10,7 +10,6 @@ on:
 
 jobs:
   build-and-deploy:
-    if: false
 
     runs-on: macos-15
 
