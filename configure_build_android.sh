@@ -89,7 +89,8 @@ fi
 if ! command -v sdkmanager &> /dev/null; then
     echo "sdkmanager is not found."
     echo "Installing sdkmanager via Homebrew..."
-    brew update && brew install sdkmanager
+    # sdkmanager is part of the android command line tools
+    brew update && brew install android-commandlinetools
 else
     echo "sdkmanager is already installed."
 fi
