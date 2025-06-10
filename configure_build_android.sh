@@ -131,7 +131,7 @@ cmake -E capabilities
 # Configure cmake (get example by configuring a dummy project in QTCreator)
 echo "Configuring cmake"
 cmake -S${SOURCE_DIR} -B${BUILD_DIR} \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_PREFIX_PATH="${QT_CMAKE_DIR}" \
     -DCMAKE_MODULE_PATH="${QT_CMAKE_DIR}" \
     -DCMAKE_TOOLCHAIN_FILE="${QT_ANDROID_TOOLCHAIN_FILE}" \
