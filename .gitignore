@@ -2,6 +2,7 @@ build/
 build_macos/
 build_ios_simulator/
 build_ios/
+build_android/
 
 # C++ objects and libs
 *.slo

@@ -58,9 +58,9 @@ check_and_install_qt() {
 
     # --- CONDITIONAL CHECK AND INSTALL FOR MAC OS DESKTOP SDK (if primary target is iOS) ---
     # This block is independent of the primary target's module check success
-    if [ "${aqt_target_os}" = "ios" ]; then
+    if [ "${aqt_target_os}" = "ios" ] || [ "${aqt_target_os}" = "android" ]; then
         echo ""
-        echo "--- Building for iOS, checking for required macOS Desktop SDK ---"
+        echo "--- Building for iOS or Android, checking for required macOS Desktop SDK ---"
         local desktop_host_platform="mac"
         local desktop_target_os="desktop"
         local desktop_arch_arg="clang_64"
@@ -78,7 +78,7 @@ check_and_install_qt() {
             echo "macOS Desktop Qt SDK version ${qt_version} for ${desktop_arch_arg} not found at ${desktop_qt_install_dir} or qmake is missing."
             echo "Proceeding with installation of macOS Desktop Qt SDK (base components)."
             # Install only base desktop components, no specific modules needed unless explicitly required for desktop host tools
-            aqt install-qt "${desktop_host_platform}" "${desktop_target_os}" "${qt_version}" "${desktop_arch_arg}" --outputdir "${qt_install_base_dir}" --modules ""
+            aqt install-qt "${desktop_host_platform}" "${desktop_target_os}" "${qt_version}" "${desktop_arch_arg}" --outputdir "${qt_install_base_dir}" --modules ${required_modules_list}
         fi
     fi
     echo "--- Qt SDK Installation Check Complete ---"
