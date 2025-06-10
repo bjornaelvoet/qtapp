@@ -59,3 +59,16 @@ jobs:
         name: qtapp-ios
         # Build dir was given by the configure script
         path: ${{ env.BUILD_DIR }}/Release-iphoneos/*
+
+    - name: Configure and build for Android target
+      shell: bash
+      run: |
+        chmod +x ./configure_build_android.sh
+        ./configure_build_android.sh
+
+    - name: Upload Android Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qtapp-ios
+        # Build dir was given by the configure script
+        path: ${{ env.BUILD_DIR }}/android-build/build/outputs/apk/release/*.apk        
