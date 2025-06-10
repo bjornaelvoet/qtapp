@@ -60,7 +60,7 @@ check_and_install_qt() {
     # This block is independent of the primary target's module check success
     if [ "${aqt_target_os}" = "ios" ] || [ "${aqt_target_os}" = "android" ]; then
         echo ""
-        echo "--- Building for iOS, checking for required macOS Desktop SDK ---"
+        echo "--- Building for iOS or Android, checking for required macOS Desktop SDK ---"
         local desktop_host_platform="mac"
         local desktop_target_os="desktop"
         local desktop_arch_arg="clang_64"
