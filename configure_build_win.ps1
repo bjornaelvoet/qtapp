@@ -59,11 +59,11 @@ if (-not $aqtinstallFound) {
     }
 }
 
-# --- MSVC Compiler Check for ARM64 ---
-Write-Host "Checking for Visual Studio 2022 ARM64 C++ Build Tools..."
+# --- MSVC Compiler Check for AMD64 ---
+Write-Host "Checking for Visual Studio 2022 AMD64 C++ Build Tools..."
 
 $vsWherePath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-$arm64CompilerFound = $false
+$amd64CompilerFound = $false
 
 if (Test-Path $vsWherePath) {
     $vs2022Path = & $vsWherePath -latest -prerelease -products Microsoft.VisualStudio.Product.BuildTools `
@@ -74,16 +74,16 @@ if (Test-Path $vsWherePath) {
 
     if ($vs2022Path) {
         Write-Host "Found Visual Studio 2022 installation at: $vs2022Path"
-        # Check for the presence of the ARM64 specific compiler executable (cl.exe)
-        # The path to cl.exe varies. A common structure for cross-compilation from x64 host to ARM64 target is Hostx64\ARM64.
-        $clExePath = Join-Path $vs2022Path "VC\Tools\MSVC\*\bin\Hostx64\ARM64\cl.exe"
+        # Check for the presence of the AMD64 specific compiler executable (cl.exe)
+        # The path to cl.exe varies. A common structure for cross-compilation from x64 host to AMD64 target is Hostx64\AMD64.
+        $clExePath = Join-Path $vs2022Path "VC\Tools\MSVC\*\bin\Hostx64\AMD64\cl.exe"
         $foundClExe = Get-ChildItem -Path $clExePath -ErrorAction SilentlyContinue | Select-Object -First 1
 
         if ($foundClExe) {
-            Write-Host "Found MSVC 2022 ARM64 C++ compiler (cl.exe) at: $($foundClExe.FullName)"
-            $arm64CompilerFound = $true
+            Write-Host "Found MSVC 2022 AMD64 C++ compiler (cl.exe) at: $($foundClExe.FullName)"
+            $amd64CompilerFound = $true
         } else {
-            Write-Warning "MSVC 2022 ARM64 C++ compiler (cl.exe) not found at expected location: $clExePath"
+            Write-Warning "MSVC 2022 AMD64 C++ compiler (cl.exe) not found at expected location: $clExePath"
         }
     } else {
         Write-Warning "Visual Studio 2022 installation not found by vswhere."
@@ -93,9 +93,9 @@ if (Test-Path $vsWherePath) {
     Write-Warning "This is common on systems where VS Build Tools are not installed in the default location."
 }
 
-if (-not $arm64CompilerFound) {
+if (-not $amd64CompilerFound) {
     Write-Error "=============================================================================="
-    Write-Error "ERROR: Visual Studio 2022 ARM64 C++ Build Tools were not found."
+    Write-Error "ERROR: Visual Studio 2022 AMD64 C++ Build Tools were not found."
     Write-Error "=============================================================================="
     exit 1 # Exit if the necessary compiler is not found
 }
@@ -128,11 +128,11 @@ if (-not $cmakeFound) {
 
 # --- Qt Download Configuration ---
 # Customize these variables to download a different Qt version or architecture.
-# Always refer to 'aqt list-qt windows_arm64 desktop --arch <version>' for exact arch strings.
+# Always refer to 'aqt list-qt windows_amd64 desktop --arch <version>' for exact arch strings.
 $qtVersion = "6.9.1"
-$targetOsHost = "windows_arm64" # Explicitly specify the ARM64 host
+$targetOsHost = "windows" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
-$arch = "win64_msvc2022_arm64" # Confirmed exact architecture from aqt list-qt
+$arch = "win64_msvc2022" # Confirmed exact architecture from aqt list-qt
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
 Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
@@ -146,8 +146,8 @@ try {
     }
 
     # Try listing for debug
-    aqt list-qt windows_arm64 desktop --arch 6.9.1
-    aqt list-qt windows_arm64 desktop --archives 6.9.1 win64_msvc2022_arm64
+    aqt list-qt windows desktop --arch 6.9.1
+    aqt list-qt windows desktop --archives 6.9.1 win64_msvc2022_arm64
 
     # Execute aqtinstall command with the correct subcommand and argument order:
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
@@ -160,5 +160,44 @@ catch {
     Write-Error "Error details: $($_.Exception.Message)"
     exit 1
 }
+
+# Load the build environment
+
+# Invokes a Cmd.exe shell script and updates the environment.
+function Invoke-CmdScript {
+  param(
+    [String] $scriptName
+  )
+  $cmdLine = """$scriptName"" $args & set"
+  & $Env:SystemRoot\system32\cmd.exe /c $cmdLine |
+  select-string '^([^=]*)=(.*)$' | foreach-object {
+    $varName = $_.Matches[0].Groups[1].Value
+    $varValue = $_.Matches[0].Groups[2].Value
+    set-item Env:$varName $varValue
+  }
+}
+
+$vcvarsallBatPath = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"
+Invoke-CmdScript $vcvarsallBatPath arm64
+
+$env:Path
+
+cl.exe
+
+
+cmake -S . -B $buildDir -DCMAKE_PREFIX_PATH=$Qt6_Dir -DCMAKE_BUILD_TYPE=Release
+
+cmake --build $buildDir --config Release
+
+Write-Host "CMake configure and build complete."
+Write-Host "Script finished."
+
+
+
+
+
+# Configure the build
+
+
 
 Write-Host "Script finished."
