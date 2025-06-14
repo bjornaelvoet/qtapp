@@ -74,6 +74,7 @@ if (Test-Path $vsWherePath) {
 
     if ($vs2022Path) {
         Write-Host "Found Visual Studio 2022 installation at: $vs2022Path"
+        $amd64CompilerFound = $true
     } else {
         Write-Warning "Visual Studio 2022 installation not found by vswhere."
     }
