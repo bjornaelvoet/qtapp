@@ -138,8 +138,8 @@ try {
 
     # Execute aqtinstall command with the correct subcommand and argument order:
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
-    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
-    Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
+    #aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
+    #Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
     # Also install the ARM64 version so we can cross-compile
     aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch_arm64
     Write-Host "Qt $qtVersion for $targetOsHost ($arch_arm64) downloaded successfully to $outputDir."
@@ -183,7 +183,7 @@ cmake --build "$buildDir" --config Release
 Write-Host "CMake configure and build complete."
 Write-Host "Script finished."
 
-cd $buildDir
+cd $buildDir\Release
 
 ls
 
