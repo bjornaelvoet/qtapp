@@ -137,11 +137,11 @@ try {
 
     # Try listing for debug
     aqt list-qt windows desktop --arch 6.9.1
-    aqt list-qt windows desktop --archives 6.9.1 win64_msvc2022
+    #aqt list-qt windows desktop --archives 6.9.1 win64_msvc2022
 
     # Execute aqtinstall command with the correct subcommand and argument order:
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
-    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
+    #aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
     Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
 }
 catch {
@@ -170,10 +170,9 @@ function Invoke-CmdScript {
 $vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
 Invoke-CmdScript $vcvarsallBatPath amd64
 
-$env:Path
 
-cl.exe
-
+$buildDir = "./build_win"
+$Qt6_dir = "./Qt/6.9.1/msvc2022_64"
 
 cmake -S . -B $buildDir -DCMAKE_PREFIX_PATH=$Qt6_Dir -DCMAKE_BUILD_TYPE=Release
 
