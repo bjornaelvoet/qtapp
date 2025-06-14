@@ -30,9 +30,6 @@ if ($pythonFound) {
 if (-not $pythonFound -or -not $pipFound) {
     Write-Error "=============================================================================="
     Write-Error "ERROR: Python and/or pip are not installed or not found in your system's PATH."
-    Write-Error "Please install Python (and ensure 'Add Python to PATH' is checked during installation)."
-    Write-Error "You can download the ARM64 Python installer from: https://www.python.org/downloads/windows/"
-    Write-Error "After installation, please restart your PowerShell console and try again."
     Write-Error "=============================================================================="
     exit 1
 }
@@ -73,16 +70,12 @@ if (-not $aqtinstallFound) {
 }
 
 # --- MSVC Compiler Check for ARM64 ---
-# For Qt 6.9.1 with win64_msvc2022_arm64_cross_compiled, we need MSVC 2022 ARM64 build tools.
 Write-Host "Checking for Visual Studio 2022 ARM64 C++ Build Tools..."
 
 $vsWherePath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
 $arm64CompilerFound = $false
 
 if (Test-Path $vsWherePath) {
-    # Use vswhere to find MSVC 2022 installations and check for ARM64 tools
-    # We are looking for the 'Desktop development with C++' workload and the ARM64 component for v143 (VS 2022)
-    # The ARM64 toolset path for VS2022 is typically like 'VC\Tools\MSVC\14.3x.xxxxx\bin\Hostx64\ARM64'
     $vs2022Path = & $vsWherePath -latest -prerelease -products Microsoft.VisualStudio.Product.BuildTools `
                                  Microsoft.VisualStudio.Product.Community `
                                  Microsoft.VisualStudio.Product.Professional `
@@ -113,10 +106,6 @@ if (Test-Path $vsWherePath) {
 if (-not $arm64CompilerFound) {
     Write-Error "=============================================================================="
     Write-Error "ERROR: Visual Studio 2022 ARM64 C++ Build Tools were not found."
-    Write-Error "To build Qt applications for ARM64, you need these tools."
-    Write-Error "On local machines, install 'Build Tools for Visual Studio 2022' (or full VS 2022),"
-    Write-Error "selecting 'Desktop development with C++' workload and 'ARM64 build tools' component."
-    Write-Error "On GitHub Actions, ensure the runner image includes these components (windows-latest usually does)."
     Write-Error "=============================================================================="
     exit 1 # Exit if the necessary compiler is not found
 }
@@ -143,10 +132,6 @@ catch {
 if (-not $cmakeFound) {
     Write-Error "=============================================================================="
     Write-Error "ERROR: CMake was not found."
-    Write-Error "CMake is required to configure Qt 6-based projects."
-    Write-Error "Please install CMake from https://cmake.org/download/ or via Chocolatey: "
-    Write-Error "choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y"
-    Write-Error "Ensure it is added to your system's PATH."
     Write-Error "=============================================================================="
     exit 1 # Exit if CMake is not found
 }
@@ -170,9 +155,12 @@ try {
         Write-Host "Created output directory: $outputDir"
     }
 
+    # Try listing for debug
+    aqt list-qt windows_arm64 desktop --arch 6.9.1
+    aqt list-qt windows_arm64 desktop --archives 6.9.1 win64_msvc2022_arm64
+
     # Execute aqtinstall command with the correct subcommand and argument order:
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
-    # --archives specifies which components to download (qtbase, qtdeclarative, qttools are common essentials)
     aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
     Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
 }
