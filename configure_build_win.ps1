@@ -122,7 +122,7 @@ if (-not $cmakeFound) {
 $qtVersion = "6.9.1"
 $targetOsHost = "windows" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
-$arch = "win64_msvc2022" # Confirmed exact architecture from aqt list-qt
+$arch = "win64_msvc2022_64" # Confirmed exact architecture from aqt list-qt
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
 Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
@@ -136,12 +136,12 @@ try {
     }
 
     # Try listing for debug
-    aqt list-qt windows desktop --arch 6.9.1
+    #aqt list-qt windows desktop --arch 6.9.1
     #aqt list-qt windows desktop --archives 6.9.1 win64_msvc2022
 
     # Execute aqtinstall command with the correct subcommand and argument order:
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
-    #aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
+    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
     Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
 }
 catch {
