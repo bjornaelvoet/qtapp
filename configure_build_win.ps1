@@ -74,17 +74,6 @@ if (Test-Path $vsWherePath) {
 
     if ($vs2022Path) {
         Write-Host "Found Visual Studio 2022 installation at: $vs2022Path"
-        # Check for the presence of the AMD64 specific compiler executable (cl.exe)
-        # The path to cl.exe varies. A common structure for cross-compilation from x64 host to AMD64 target is Hostx64\AMD64.
-        $clExePath = Join-Path $vs2022Path "VC\Tools\MSVC\*\bin\Hostx64\AMD64\cl.exe"
-        $foundClExe = Get-ChildItem -Path $clExePath -ErrorAction SilentlyContinue | Select-Object -First 1
-
-        if ($foundClExe) {
-            Write-Host "Found MSVC 2022 AMD64 C++ compiler (cl.exe) at: $($foundClExe.FullName)"
-            $amd64CompilerFound = $true
-        } else {
-            Write-Warning "MSVC 2022 AMD64 C++ compiler (cl.exe) not found at expected location: $clExePath"
-        }
     } else {
         Write-Warning "Visual Studio 2022 installation not found by vswhere."
     }
