@@ -167,31 +167,38 @@ function Invoke-CmdScript {
   }
 }
 
+# Loading the visual studio build variables into our environment
+Write-Host "Loading Visual Studio Build Variables..."
 $vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
 Invoke-CmdScript $vcvarsallBatPath amd64
 
+# Some helper paths to feed into cmake
 $buildDir = "./build_win"
+$buildDir_arm64 = "./build_win_arm64"
 $Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\msvc2022_64" 
+$Qt6_dir_arm64 = "$PSScriptRoot\Qt\$qtVersion\msvc2022_arm64" 
 $toolchainFilePath = "$Qt6_dir\lib\cmake\Qt6\qt.toolchain.cmake"
+$toolchainFilePath_arm64 = "$Qt6_dir_arm64\lib\cmake\Qt6\qt.toolchain.cmake"
 
-
-
+# Building the x64 version first
+Write-Host "Building x64 version..."
 cmake -S . -B "$buildDir" -DCMAKE_PREFIX_PATH="$Qt6_Dir" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath"
-
 cmake --build "$buildDir" --config Release
 
+# Bundling application
+cd $BuildDir\Release
+$Qt6_dir/bin/windeployqt --qmldir=../.. --release QtApp.exe
+cd ../..
+
+# Now cross-compiling for the ARM64 version
+Write-Host "Building arm64 version..."
+cmake -S . -B "$buildDir_arm64" -DCMAKE_PREFIX_PATH="$Qt6_Dir_arm64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath_arm64"
+cmake --build "$buildDir_arm64" --config Release
+
+# Bundling arm64 application
+cd $BuildDir_arm64\Release
+$Qt6_dir/bin/windeployqt --qmldir=../.. --release QtApp.exe
+cd ../..
+
 Write-Host "CMake configure and build complete."
-Write-Host "Script finished."
-
-cd $buildDir\Release
-
-ls
-
-
-
-
-# Configure the build
-
-
-
 Write-Host "Script finished."
