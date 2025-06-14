@@ -36,23 +36,14 @@ if (-not $pythonFound -or -not $pipFound) {
 
 # --- Check and Install aqtinstall ---
 Write-Host "Checking for aqtinstall..."
-
 $aqtinstallFound = $false
-# Use pip show to robustly check if aqtinstall is present
 try {
-    # If pip show aqtinstall succeeds, it means it's installed.
-    # We check for specific text in the output to confirm it's an actual package, not just an empty result.
-    $pipShowOutput = pip show aqtinstall 2>&1
-    if ($pipShowOutput -match "Name: aqtinstall") {
-        $aqtinstallFound = $true
-        Write-Host "aqtinstall is already installed."
-    } else {
-        Write-Warning "aqtinstall not found via pip. Installing it now..."
-    }
+    aqt --help | Out-Null
+    $aqtinstallFound = $true    
+    Write-Host "aqtinstall is already installed."
 }
 catch {
-    # This catch block would hit if 'pip' itself wasn't found, but we already checked that.
-    Write-Warning "Could not verify aqtinstall presence using 'pip show'. Attempting installation anyway."
+    Write-Warning "aqtinstall is not found."
 }
 
 if (-not $aqtinstallFound) {
