@@ -11,7 +11,7 @@ on:
 jobs:
   build-and-deploy:
 
-    runs-on: windows-11
+    runs-on: windows-2025
 
     env:
       # Default build dir. Will be overwritten by the configure build scripts.
