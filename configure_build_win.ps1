@@ -123,7 +123,6 @@ $qtVersion = "6.9.1"
 $targetOsHost = "windows" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
 $arch = "win64_msvc2022_64" # Confirmed exact architecture from aqt list-qt
-#$arch_arm64 = "win64_msvc2022_arm64"
 $arch_arm64 = "win64_msvc2022_arm64_cross_compiled"
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
@@ -139,8 +138,8 @@ try {
 
     # Execute aqtinstall command with the correct subcommand and argument order:
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
-    #aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
-    #Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
+    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
+    Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
     # Also install the ARM64 version so we can cross-compile
     aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch_arm64
     Write-Host "Qt $qtVersion for $targetOsHost ($arch_arm64) downloaded successfully to $outputDir."
