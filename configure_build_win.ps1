@@ -172,7 +172,7 @@ Invoke-CmdScript $vcvarsallBatPath amd64
 
 $buildDir = "./build_win"
 $Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\msvc2022_64" 
-$toolchainFilePath = "$Qt6_dir\lib\cmake\qt.toolchain.cmake"
+$toolchainFilePath = "$Qt6_dir\lib\cmake\Qt6\qt.toolchain.cmake"
 
 cmake -S . -B $buildDir -DCMAKE_PREFIX_PATH=$Qt6_Dir -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$toolchainFilePath
 
