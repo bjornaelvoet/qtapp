@@ -174,6 +174,12 @@ $buildDir = "./build_win"
 $Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\msvc2022_64" 
 $toolchainFilePath = "$Qt6_dir\lib\cmake\Qt6\qt.toolchain.cmake"
 
+cd $Qt6_dir
+ls
+
+cd ./lib//cmake/Qt6
+ls
+
 cmake -S . -B $buildDir -DCMAKE_PREFIX_PATH=$Qt6_Dir -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$toolchainFilePath
 
 cmake --build $buildDir --config Release
