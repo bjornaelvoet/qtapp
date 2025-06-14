@@ -172,7 +172,7 @@ Invoke-CmdScript $vcvarsallBatPath amd64
 
 
 $buildDir = "./build_win"
-$Qt6_dir = "./Qt/6.9.1/msvc2022_64"
+$Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\$arch" 
 
 cmake -S . -B $buildDir -DCMAKE_PREFIX_PATH=$Qt6_Dir -DCMAKE_BUILD_TYPE=Release
 
