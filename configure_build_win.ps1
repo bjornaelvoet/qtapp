@@ -187,8 +187,8 @@ cmake --build "$buildDir" --config Release
 
 # Bundling application
 cd "$BuildDir"\Release
-"$Qt6_dir"/bin/windeployqt --qmldir=../.. --release QtApp.exe
-cd ../..
+"$Qt6_dir"\bin\windeployqt --qmldir=..\.. --release QtApp.exe
+cd ..\..
 
 # Now cross-compiling for the ARM64 version
 Write-Host "Building arm64 version..."
@@ -197,8 +197,8 @@ cmake --build "$buildDir_arm64" --config Release
 
 # Bundling arm64 application
 cd "$BuildDir_arm64"\Release
-"$Qt6_dir"/bin/windeployqt --qmldir=../.. --release QtApp.exe
-cd ../..
+"$Qt6_dir"\bin\windeployqt --qmldir=..\.. --release QtApp.exe
+cd ..\..
 
 Write-Host "CMake configure and build complete."
 Write-Host "Script finished."
