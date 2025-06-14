@@ -123,7 +123,8 @@ $qtVersion = "6.9.1"
 $targetOsHost = "windows" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
 $arch = "win64_msvc2022_64" # Confirmed exact architecture from aqt list-qt
-$arch_arm64 = "win64_msvc2022_arm64_cross_compiled"
+#$arch_arm64 = "win64_msvc2022_arm64_cross_compiled"
+$arch_arm64 = "win64_msvc2022_arm64"
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
 Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
@@ -199,6 +200,14 @@ cmake --build "$buildDir_arm64" --config Release
 cd "$BuildDir_arm64\Release"
 & "$(Join-Path $Qt6_dir_arm64 'bin\windeployqt')" --qmldir=..\.. --release QtApp.exe
 cd ..\..
+
+# We need the build path exposed to github workflow for artefact upload
+if ($env:CI -eq "true") {
+    # Remove leading './' if present and append to GITHUB_ENV
+    $BuildDirWithoutDotSlash = $env:BUILD_DIR -replace '^\./', ''
+    Add-Content -Path $env:GITHUB_ENV -Value "BUILD_DIR=$BuildDirWithoutDotSlash"
+}
+
 
 Write-Host "CMake configure and build complete."
 Write-Host "Script finished."
