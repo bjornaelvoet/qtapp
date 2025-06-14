@@ -167,8 +167,8 @@ function Invoke-CmdScript {
   }
 }
 
-$vcvarsallBatPath = "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat"
-Invoke-CmdScript $vcvarsallBatPath arm64
+$vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+Invoke-CmdScript $vcvarsallBatPath amd64
 
 $env:Path
 
