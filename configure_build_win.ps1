@@ -123,6 +123,7 @@ $qtVersion = "6.9.1"
 $targetOsHost = "windows" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
 $arch = "win64_msvc2022_64" # Confirmed exact architecture from aqt list-qt
+$arch_arm64 = "win64_msvc2022_arm64"
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
 Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
@@ -135,14 +136,13 @@ try {
         Write-Host "Created output directory: $outputDir"
     }
 
-    # Try listing for debug
-    #aqt list-qt windows desktop --arch 6.9.1
-    #aqt list-qt windows desktop --archives 6.9.1 win64_msvc2022
-
     # Execute aqtinstall command with the correct subcommand and argument order:
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
     aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
     Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
+    # Also install the ARM64 version so we can cross-compile
+    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch_arm64
+    Write-Host "Qt $qtVersion for $targetOsHost ($arch_arm64) downloaded successfully to $outputDir."
 }
 catch {
     Write-Error "Failed to download Qt. Please check the Qt version, OS, and architecture, or your internet connection."
@@ -183,6 +183,9 @@ cmake --build "$buildDir" --config Release
 Write-Host "CMake configure and build complete."
 Write-Host "Script finished."
 
+cd $buildDir
+
+ls
 
 
 
