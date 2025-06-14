@@ -57,9 +57,8 @@ catch {
 
 if (-not $aqtinstallFound) {
     try {
-        # Using --user to install for the current user, no admin required for aqtinstall itself
         # --upgrade ensures it's the latest version if a partial install existed
-        pip install aqtinstall --user --upgrade
+        pip install aqtinstall --upgrade
         Write-Host "aqtinstall installed successfully."
     }
     catch {
