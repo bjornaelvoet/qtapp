@@ -137,7 +137,7 @@ try {
 
     # Try listing for debug
     aqt list-qt windows desktop --arch 6.9.1
-    aqt list-qt windows desktop --archives 6.9.1 win64_msvc2022_arm64
+    aqt list-qt windows desktop --archives 6.9.1 win64_msvc2022
 
     # Execute aqtinstall command with the correct subcommand and argument order:
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
