@@ -51,7 +51,7 @@ foreach ($c in $components) {
 # --norestart: suppresses reboots (handle reboots separately if needed)
 # --includeRecommended: installs recommended components for selected workloads
 # --lang en-US: installs English language pack
-$arguments = "--productId Microsoft.VisualStudio.Product.Community $addArguments --quiet --wait --norestart"
+$arguments = "--productId Microsoft.VisualStudio.Product.Community $addArguments --includeRecommended --quiet --wait --norestart"
 
 Write-Host "Starting Visual Studio 2022 unattended installation for C++ ARM64 development..."
 
@@ -267,7 +267,7 @@ function Invoke-CmdScript {
 
 # Loading the visual studio build variables into our environment
 Write-Host "Loading Visual Studio Build Variables..."
-$vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+$vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat"
 Invoke-CmdScript $vcvarsallBatPath amd64
 
 # Some helper paths to feed into cmake
