@@ -123,8 +123,7 @@ $qtVersion = "6.9.1"
 $targetOsHost = "windows" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
 $arch = "win64_msvc2022_64" # Confirmed exact architecture from aqt list-qt
-#$arch_arm64 = "win64_msvc2022_arm64_cross_compiled"
-$arch_arm64 = "win64_msvc2022_arm64"
+$arch_arm64 = "win64_msvc2022_arm64_cross_compiled"
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
 Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
