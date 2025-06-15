@@ -20,20 +20,20 @@ $workloads = @(
 
 $components = @(
     # Essential C++ Build Tools (VS 2022) for ARM64
-    "Microsoft.VisualStudio.Component.VC.Tools.ARM64"           # MSVC v143 - VS 2022 C++ ARM64 build tools (Crucial for ARM64 targeting)
-    "Microsoft.VisualStudio.Component.VC.ATLMFC.ARM64"          # C++ ATL/MFC for ARM64 (if needed)
+    #"Microsoft.VisualStudio.Component.VC.Tools.ARM64"           # MSVC v143 - VS 2022 C++ ARM64 build tools (Crucial for ARM64 targeting)
+    #"Microsoft.VisualStudio.Component.VC.ATLMFC.ARM64"          # C++ ATL/MFC for ARM64 (if needed)
 
     # If you also need to target x64/x86 from your ARM64 host (cross-compilation)
     #"Microsoft.VisualStudio.Component.VC.Tools.x86.x64"         # MSVC v143 - VS 2022 C++ x64/x86 build tools
 
     # Windows SDKs
-    "Microsoft.VisualStudio.Component.Windows11SDK.10.0.22621.0" # Windows 11 SDK (adjust version as needed for your target OS)
+    #"Microsoft.VisualStudio.Component.Windows11SDK.10.0.22621.0" # Windows 11 SDK (adjust version as needed for your target OS)
 
     # Optional but often useful:
-    "Microsoft.VisualStudio.Component.VC.Redist.14.ARM64"        # Visual C++ Redistributable for VS 2015-2022 (ARM64)
-    "Microsoft.VisualStudio.Component.VC.Redist.14"              # Visual C++ Redistributable for VS 2015-2022 (x86/x64) - if needed
-    "Microsoft.VisualStudio.Component.CppBuildTools.MSBuild"     # MSBuild for C++
-    "Microsoft.VisualStudio.Component.TestTools.Core"            # Test tools core features
+    #"Microsoft.VisualStudio.Component.VC.Redist.14.ARM64"        # Visual C++ Redistributable for VS 2015-2022 (ARM64)
+    #"Microsoft.VisualStudio.Component.VC.Redist.14"              # Visual C++ Redistributable for VS 2015-2022 (x86/x64) - if needed
+    #"Microsoft.VisualStudio.Component.CppBuildTools.MSBuild"     # MSBuild for C++
+    #"Microsoft.VisualStudio.Component.TestTools.Core"            # Test tools core features
 )
 
 # Convert workloads and components to command-line arguments
