@@ -200,7 +200,7 @@ Write-Host "Building arm64 version..."
 #& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" --build "$buildDir_arm64"
 
 # Build using Visual Studio 2022
-cd "$BuildDir"
+cd "$BuildDir_arm64"
 #msbuild QtApp.sln /p:Configuration=Release /p:Platform=ARM64
 msbuild QtApp.sln /p:Configuration=Release
 cd ..
