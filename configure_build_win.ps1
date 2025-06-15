@@ -194,10 +194,15 @@ cd ..\..
 Write-Host "Building arm64 version..."
 #cmake -S . -B "$buildDir_arm64" -DCMAKE_PREFIX_PATH="$Qt6_Dir_arm64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath_arm64" -DQT_HOST_PATH="$Qt6_Dir"
 #cmake --build "$buildDir_arm64" --config Release
-& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" -S . -B "$buildDir_arm64" -DCMAKE_PREFIX_PATH="$Qt6_Dir_arm64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath_arm64" -DQT_HOST_PATH="$Qt6_Dir"
+& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" -G "Visual Studio 17 2022" -A "ARM64" -S . -B "$buildDir_arm64" -DCMAKE_PREFIX_PATH="$Qt6_Dir_arm64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath_arm64" -DQT_HOST_PATH="$Qt6_Dir"
 #& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" --build "$buildDir_arm64" --config Release
-& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" -h
-& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" --build "$buildDir_arm64"
+#& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" -h
+#& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" --build "$buildDir_arm64"
+
+# Build using Visual Studio 2022
+cd "$BuildDir"
+msbuild QtApp.sln /p:Configuration=Release /p:Platform=ARM64
+cd ..
 
 # Bundling arm64 application
 cd "$BuildDir_arm64\Release"
