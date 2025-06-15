@@ -1,5 +1,100 @@
 # This script installs aqtinstall and downloads a specific Qt version for Windows ARM64.
 
+
+# Define variables
+$vsEdition = "Community" # Options: Community, Professional, Enterprise
+$vsBootstrapperUrl = "https://aka.ms/vs/17/release/vs_${vsEdition}.exe"
+$downloadPath = "$env:TEMP\vs_bootstrapper.exe"
+$installPath = "C:\Program Files\Microsoft Visual Studio\2022\$vsEdition" # Customize install path
+$logFile = "$env:TEMP\vs_install_log.txt"
+
+# Define the C++ workloads and components you want to install specifically for ARM64 development.
+# Refer to https://learn.microsoft.com/en-us/visualstudio/install/workload-and-component-ids
+# Ensure you are referencing the correct IDs for ARM64 components.
+
+$workloads = @(
+    "Microsoft.VisualStudio.Workload.NativeDesktop" # Desktop development with C++
+    #"Microsoft.VisualStudio.Workload.NativeGame"    # Game development with C++ (consider if ARM64 gaming is relevant)
+    #"Microsoft.VisualStudio.Workload.NativeCrossPlat" # Linux and embedded development with C++
+)
+
+$components = @(
+    # Essential C++ Build Tools (VS 2022) for ARM64
+    "Microsoft.VisualStudio.Component.VC.Tools.ARM64"           # MSVC v143 - VS 2022 C++ ARM64 build tools (Crucial for ARM64 targeting)
+    "Microsoft.VisualStudio.Component.VC.ATLMFC.ARM64"          # C++ ATL/MFC for ARM64 (if needed)
+
+    # If you also need to target x64/x86 from your ARM64 host (cross-compilation)
+    #"Microsoft.VisualStudio.Component.VC.Tools.x86.x64"         # MSVC v143 - VS 2022 C++ x64/x86 build tools
+
+    # Windows SDKs
+    "Microsoft.VisualStudio.Component.Windows11SDK.10.0.22621.0" # Windows 11 SDK (adjust version as needed for your target OS)
+
+    # Optional but often useful:
+    "Microsoft.VisualStudio.Component.VC.Redist.14.ARM64"        # Visual C++ Redistributable for VS 2015-2022 (ARM64)
+    "Microsoft.VisualStudio.Component.VC.Redist.14"              # Visual C++ Redistributable for VS 2015-2022 (x86/x64) - if needed
+    "Microsoft.VisualStudio.Component.CppBuildTools.MSBuild"     # MSBuild for C++
+    "Microsoft.VisualStudio.Component.TestTools.Core"            # Test tools core features
+)
+
+# Convert workloads and components to command-line arguments
+$addArguments = ""
+foreach ($w in $workloads) {
+    $addArguments += "--add $w "
+}
+foreach ($c in $components) {
+    $addArguments += "--add $c "
+}
+
+# Construct the full argument list for the installer
+# --quiet: completely silent
+# --wait: waits for the installation to complete before the process exits
+# --norestart: suppresses reboots (handle reboots separately if needed)
+# --includeRecommended: installs recommended components for selected workloads
+# --lang en-US: installs English language pack
+$arguments = "--installPath ""$installPath"" $addArguments --includeRecommended --lang en-US --quiet --wait --norestart --log ""$logFile"""
+
+Write-Host "Starting Visual Studio 2022 unattended installation for C++ ARM64 development..."
+
+# Check if running with administrator privileges
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Error "This script must be run with Administrator privileges. Please right-click and 'Run as Administrator'."
+    exit 1
+}
+
+# 1. Download the Visual Studio bootstrapper (the bootstrapper itself is usually x86 but orchestrates ARM64 downloads)
+Write-Host "Downloading Visual Studio 2022 bootstrapper from $vsBootstrapperUrl to $downloadPath..."
+try {
+    Invoke-WebRequest -Uri $vsBootstrapperUrl -OutFile $downloadPath -UseBasicParsing
+    Write-Host "Bootstrapper downloaded successfully."
+}
+catch {
+    Write-Error "Failed to download Visual Studio bootstrapper: $($_.Exception.Message)"
+    exit 1
+}
+
+# 2. Start the unattended installation
+Write-Host "Starting Visual Studio installation in unattended mode..."
+Write-Host "Command: ""$downloadPath"" $arguments"
+
+try {
+    # Start the process and wait for it to complete
+    $process = Start-Process -FilePath $downloadPath -ArgumentList $arguments -NoNewWindow -PassThru -Wait
+
+    if ($process.ExitCode -eq 0) {
+        Write-Host "Visual Studio 2022 for C++ ARM64 development installed successfully!"
+        Write-Host "Installation log: $logFile"
+    }
+    else {
+        Write-Error "Visual Studio 2022 installation failed with exit code $($process.ExitCode)."
+        Write-Error "Please check the log file for details: $logFile"
+        exit $process.ExitCode
+    }
+}
+catch {
+    Write-Error "An error occurred during Visual Studio installation: $($_.Exception.Message)"
+    exit 1
+}
+
 Write-Host "Checking for Python and pip..."
 
 $pythonFound = $false
@@ -59,11 +154,11 @@ if (-not $aqtinstallFound) {
     }
 }
 
-# --- MSVC Compiler Check for AMD64 ---
-Write-Host "Checking for Visual Studio 2022 AMD64 C++ Build Tools..."
+# --- MSVC Compiler Check for ARM64 ---
+Write-Host "Checking for Visual Studio 2022 ARM64 C++ Build Tools..."
 
 $vsWherePath = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-$amd64CompilerFound = $false
+$arm64CompilerFound = $false
 
 if (Test-Path $vsWherePath) {
     $vs2022Path = & $vsWherePath -latest -prerelease -products Microsoft.VisualStudio.Product.BuildTools `
@@ -74,7 +169,7 @@ if (Test-Path $vsWherePath) {
 
     if ($vs2022Path) {
         Write-Host "Found Visual Studio 2022 installation at: $vs2022Path"
-        $amd64CompilerFound = $true
+        $arm64CompilerFound = $true
     } else {
         Write-Warning "Visual Studio 2022 installation not found by vswhere."
     }
@@ -83,12 +178,19 @@ if (Test-Path $vsWherePath) {
     Write-Warning "This is common on systems where VS Build Tools are not installed in the default location."
 }
 
-if (-not $amd64CompilerFound) {
+if (-not $arm64CompilerFound) {
     Write-Error "=============================================================================="
-    Write-Error "ERROR: Visual Studio 2022 AMD64 C++ Build Tools were not found."
+    Write-Error "ERROR: Visual Studio 2022 ARM64 C++ Build Tools were not found."
     Write-Error "=============================================================================="
-    exit 1 # Exit if the necessary compiler is not found
+    #exit 1 # Exit if the necessary compiler is not found
+
+    # Install Visual Studio 2022
+
 }
+
+
+
+
 
 # --- CMake Check ---
 Write-Host "Checking for CMake..."
@@ -120,10 +222,9 @@ if (-not $cmakeFound) {
 # Customize these variables to download a different Qt version or architecture.
 # Always refer to 'aqt list-qt windows_amd64 desktop --arch <version>' for exact arch strings.
 $qtVersion = "6.9.1"
-$targetOsHost = "windows" # Explicitly specify the AMD64 host
+$targetOsHost = "windows_arm64" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
-$arch = "win64_msvc2022_64" # Confirmed exact architecture from aqt list-qt
-$arch_arm64 = "win64_msvc2022_arm64_cross_compiled"
+$arch = "win64_msvc2022_arm64" # Confirmed exact architecture from aqt list-qt
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
 Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
@@ -140,9 +241,6 @@ try {
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
     aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
     Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
-    # Also install the ARM64 version so we can cross-compile
-    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch_arm64
-    Write-Host "Qt $qtVersion for $targetOsHost ($arch_arm64) downloaded successfully to $outputDir."
 }
 catch {
     Write-Error "Failed to download Qt. Please check the Qt version, OS, and architecture, or your internet connection."
@@ -173,50 +271,28 @@ $vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC
 Invoke-CmdScript $vcvarsallBatPath amd64
 
 # Some helper paths to feed into cmake
-$buildDir = "./build_win"
-$buildDir_arm64 = "./build_win_arm64"
-$Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\msvc2022_64" 
-$Qt6_dir_arm64 = "$PSScriptRoot\Qt\$qtVersion\msvc2022_arm64" 
+$buildDir = "./build_arm64"
+$Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\msvc2022_arm64" 
 $toolchainFilePath = "$Qt6_dir\lib\cmake\Qt6\qt.toolchain.cmake"
-$toolchainFilePath_arm64 = "$Qt6_dir_arm64\lib\cmake\Qt6\qt.toolchain.cmake"
 
-# Building the x64 version first
-Write-Host "Building x64 version..."
+# Building the arm64 version
+Write-Host "Building arm64 version..."
 cmake -S . -B "$buildDir" -DCMAKE_PREFIX_PATH="$Qt6_Dir" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath"
 cmake --build "$buildDir" --config Release
 
 # Bundling application
-cd "$BuildDir\Release"
-& "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=..\.. --release QtApp.exe
-cd ..\..
-
-# Now cross-compiling for the ARM64 version
-Write-Host "Building arm64 version..."
-#cmake -S . -B "$buildDir_arm64" -DCMAKE_PREFIX_PATH="$Qt6_Dir_arm64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath_arm64" -DQT_HOST_PATH="$Qt6_Dir"
-#cmake --build "$buildDir_arm64" --config Release
-& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" -G "Visual Studio 17 2022" -A "ARM64" -S . -B "$buildDir_arm64" -DCMAKE_PREFIX_PATH="$Qt6_Dir_arm64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath_arm64" -DQT_HOST_PATH="$Qt6_Dir"
-#& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" --build "$buildDir_arm64" --config Release
-#& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" -h
-#& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" --build "$buildDir_arm64"
-
-# Build using Visual Studio 2022
-cd "$BuildDir_arm64"
-#msbuild QtApp.sln /p:Configuration=Release /p:Platform=ARM64
-msbuild QtApp.sln /p:Configuration=Release
-cd ..
+& "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=. --release "$BuildDir\Release\QtApp.exe"
+cmake --build "$buildDir" --config Release
 
 # Bundling arm64 application
-cd "$BuildDir_arm64\Release"
-& "$(Join-Path $Qt6_dir_arm64 'bin\windeployqt')" --qmldir=..\.. --release QtApp.exe
-cd ..\..
+& "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=. --release "$BuildDir\Release\QtApp.exe"
 
 # We need the build path exposed to github workflow for artefact upload
 if ($env:CI -eq "true") {
     # Remove leading './' if present and append to GITHUB_ENV
     $BuildDirWithoutDotSlash = $env:BUILD_DIR -replace '^\./', ''
-    Add-Content -Path $env:GITHUB_ENV -Value "BUILD_DIR=$BuildDirWithoutDotSlash"
+    Add-Content -Path $env:GITHUB_ENV -Value "BUILD_DIR_ARM64=$BuildDirWithoutDotSlash"
 }
-
 
 Write-Host "CMake configure and build complete."
 Write-Host "Script finished."

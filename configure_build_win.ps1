@@ -1,4 +1,4 @@
-# This script installs aqtinstall and downloads a specific Qt version for Windows x64.
+# This script installs aqtinstall and downloads a specific Qt version for Windows AMD64.
 
 Write-Host "Checking for Python and pip..."
 
@@ -90,8 +90,6 @@ if (-not $amd64CompilerFound) {
     exit 1 # Exit if the necessary compiler is not found
 }
 
-
-
 # --- CMake Check ---
 Write-Host "Checking for CMake..."
 
@@ -125,7 +123,6 @@ $qtVersion = "6.9.1"
 $targetOsHost = "windows" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
 $arch = "win64_msvc2022_64" # Confirmed exact architecture from aqt list-qt
-$arch_arm64 = "win64_msvc2022_arm64_cross_compiled"
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
 Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
@@ -142,9 +139,6 @@ try {
     # Order: aqt install-qt [options] <host> <target> <version> [arch]
     aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
     Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
-    # Also install the ARM64 version so we can cross-compile
-    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch_arm64
-    Write-Host "Qt $qtVersion for $targetOsHost ($arch_arm64) downloaded successfully to $outputDir."
 }
 catch {
     Write-Error "Failed to download Qt. Please check the Qt version, OS, and architecture, or your internet connection."
@@ -175,50 +169,24 @@ $vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC
 Invoke-CmdScript $vcvarsallBatPath amd64
 
 # Some helper paths to feed into cmake
-$buildDir = "./build_win"
-$buildDir_arm64 = "./build_win_arm64"
+$buildDir = "./build_amd64"
 $Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\msvc2022_64" 
-$Qt6_dir_arm64 = "$PSScriptRoot\Qt\$qtVersion\msvc2022_arm64" 
 $toolchainFilePath = "$Qt6_dir\lib\cmake\Qt6\qt.toolchain.cmake"
-$toolchainFilePath_arm64 = "$Qt6_dir_arm64\lib\cmake\Qt6\qt.toolchain.cmake"
 
-# Building the x64 version first
+# Building the x64 version
 Write-Host "Building x64 version..."
 cmake -S . -B "$buildDir" -DCMAKE_PREFIX_PATH="$Qt6_Dir" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath"
 cmake --build "$buildDir" --config Release
 
 # Bundling application
-cd "$BuildDir\Release"
-& "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=..\.. --release QtApp.exe
-cd ..\..
-
-# Now cross-compiling for the ARM64 version
-Write-Host "Building arm64 version..."
-#cmake -S . -B "$buildDir_arm64" -DCMAKE_PREFIX_PATH="$Qt6_Dir_arm64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath_arm64" -DQT_HOST_PATH="$Qt6_Dir"
-#cmake --build "$buildDir_arm64" --config Release
-& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" -G "Visual Studio 17 2022" -A "ARM64" -S . -B "$buildDir_arm64" -DCMAKE_PREFIX_PATH="$Qt6_Dir_arm64" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath_arm64" -DQT_HOST_PATH="$Qt6_Dir"
-#& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" --build "$buildDir_arm64" --config Release
-#& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" -h
-#& "$(Join-Path $Qt6_dir_arm64 'bin\qt-cmake')" --build "$buildDir_arm64"
-
-# Build using Visual Studio 2022
-cd "$BuildDir_arm64\Release--"
-#msbuild QtApp.sln /p:Configuration=Release /p:Platform=ARM64
-msbuild QtApp.sln /p:Configuration=Release
-cd ..
-
-# Bundling arm64 application
-cd "$BuildDir_arm64\Release"
-& "$(Join-Path $Qt6_dir_arm64 'bin\windeployqt')" --qmldir=..\.. --release QtApp.exe
-cd ..\..
+& "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=. --release "$BuildDir\Release\QtApp.exe"
 
 # We need the build path exposed to github workflow for artefact upload
 if ($env:CI -eq "true") {
     # Remove leading './' if present and append to GITHUB_ENV
     $BuildDirWithoutDotSlash = $env:BUILD_DIR -replace '^\./', ''
-    Add-Content -Path $env:GITHUB_ENV -Value "BUILD_DIR=$BuildDirWithoutDotSlash"
+    Add-Content -Path $env:GITHUB_ENV -Value "BUILD_DIR_AMD64=$BuildDirWithoutDotSlash"
 }
-
 
 Write-Host "CMake configure and build complete."
 Write-Host "Script finished."
