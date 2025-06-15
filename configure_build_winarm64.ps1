@@ -51,7 +51,7 @@ foreach ($c in $components) {
 # --norestart: suppresses reboots (handle reboots separately if needed)
 # --includeRecommended: installs recommended components for selected workloads
 # --lang en-US: installs English language pack
-$arguments = "--installPath ""$installPath"" $addArguments --includeRecommended --lang en-US --quiet --wait --norestart --log ""$logFile"""
+$arguments = "--productId Microsoft.VisualStudio.Product.Community $addArguments --quiet --wait --norestart --log ""$logFile"""
 
 Write-Host "Starting Visual Studio 2022 unattended installation for C++ ARM64 development..."
 
