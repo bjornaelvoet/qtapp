@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build-and-deploy-x64:
 
     runs-on: windows-2025
 
@@ -26,4 +26,20 @@ jobs:
       run: |
         ./configure_build_win.ps1
 
-   
+  build-and-deploy-arm64:
+
+    runs-on: windows-11-arm
+
+    env:
+      # Default build dir. Will be overwritten by the configure build scripts.
+      BUILD_DIR: "build"
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure and build for Windows target
+      shell: powershell
+      run: |
+        ./configure_build_winarm64.ps1
+        
