@@ -201,7 +201,8 @@ Write-Host "Building arm64 version..."
 
 # Build using Visual Studio 2022
 cd "$BuildDir"
-msbuild QtApp.sln /p:Configuration=Release /p:Platform=ARM64
+#msbuild QtApp.sln /p:Configuration=Release /p:Platform=ARM64
+msbuild QtApp.sln /p:Configuration=Release
 cd ..
 
 # Bundling arm64 application
