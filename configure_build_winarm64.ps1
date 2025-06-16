@@ -109,6 +109,7 @@ if (-not $arm64CompilerFound) {
 
     $components = @(
         # Essential C++ Build Tools (VS 2022) for ARM64
+        "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
         "Microsoft.VisualStudio.Component.VC.Tools.ARM64"
         #"Microsoft.VisualStudio.Component.VC.Tools.ARM64"           # MSVC v143 - VS 2022 C++ ARM64 build tools (Crucial for ARM64 targeting)
         #"Microsoft.VisualStudio.Component.VC.ATLMFC.ARM64"          # C++ ATL/MFC for ARM64 (if needed)
@@ -296,7 +297,8 @@ cmake --build "$buildDir" --config Release
 # We need the build path exposed to github workflow for artefact upload
 if ($env:CI -eq "true") {
     # Remove leading './' if present and append to GITHUB_ENV
-    $BuildDirWithoutDotSlash = $env:BUILD_DIR -replace '^\./', ''
+    $BuildDirWithoutDotSlash = $env:$buildDir -replace '^\./', ''
+    echo "Debug: $BuildDirWithoutDotSlash"
     Add-Content -Path $env:GITHUB_ENV -Value "BUILD_DIR_ARM64=$BuildDirWithoutDotSlash"
 }
 

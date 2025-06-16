@@ -91,7 +91,7 @@ if (-not $amd64CompilerFound) {
 
     # Install Visual Studio 2022
     # Define variable
-    $vsEdition = "Community" # Options: Community, Professional, Enterprise
+    $vsEdition = "Enterprise" # Options: Community, Professional, Enterprise
     $vsBootstrapperUrl = "https://aka.ms/vs/17/release/vs_${vsEdition}.exe"
     $downloadPath = "$env:TEMP\vs_bootstrapper.exe"
     $installPath = "C:\Program Files\Microsoft Visual Studio\2022\$vsEdition" # Customize install path
@@ -102,7 +102,6 @@ if (-not $amd64CompilerFound) {
     # Ensure you are referencing the correct IDs for ARM64 components.
 
     $workloads = @(
-        # TODO Check if we really need to install this???
         #"Microsoft.VisualStudio.Workload.NativeDesktop" # Desktop development with C++
         #"Microsoft.VisualStudio.Workload.NativeGame"    # Game development with C++ (consider if ARM64 gaming is relevant)
         #"Microsoft.VisualStudio.Workload.NativeCrossPlat" # Linux and embedded development with C++
@@ -111,6 +110,7 @@ if (-not $amd64CompilerFound) {
     $components = @(
         # Essential C++ Build Tools (VS 2022) for x86.x64
         "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+        "Microsoft.VisualStudio.Component.VC.Tools.ARM64"
         # Windows SDKs
         "Microsoft.VisualStudio.Component.Windows11SDK.26100"
     )
@@ -280,7 +280,8 @@ cmake --build "$buildDir" --config Release
 # We need the build path exposed to github workflow for artefact upload
 if ($env:CI -eq "true") {
     # Remove leading './' if present and append to GITHUB_ENV
-    $BuildDirWithoutDotSlash = $env:BUILD_DIR -replace '^\./', ''
+    $BuildDirWithoutDotSlash = $env:$buildDir -replace '^\./', ''
+    echo "Debug: $BuildDirWithoutDotSlash"
     Add-Content -Path $env:GITHUB_ENV -Value "BUILD_DIR_AMD64=$BuildDirWithoutDotSlash"
 }
 
