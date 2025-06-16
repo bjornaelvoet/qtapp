@@ -20,6 +20,7 @@ $workloads = @(
 
 $components = @(
     # Essential C++ Build Tools (VS 2022) for ARM64
+    "Microsoft.VisualStudio.Component.VC.Tools.ARM64"
     #"Microsoft.VisualStudio.Component.VC.Tools.ARM64"           # MSVC v143 - VS 2022 C++ ARM64 build tools (Crucial for ARM64 targeting)
     #"Microsoft.VisualStudio.Component.VC.ATLMFC.ARM64"          # C++ ATL/MFC for ARM64 (if needed)
 
@@ -28,6 +29,7 @@ $components = @(
 
     # Windows SDKs
     #"Microsoft.VisualStudio.Component.Windows11SDK.10.0.22621.0" # Windows 11 SDK (adjust version as needed for your target OS)
+    "Microsoft.VisualStudio.Component.Windows11SDK.26100"
 
     # Optional but often useful:
     #"Microsoft.VisualStudio.Component.VC.Redist.14.ARM64"        # Visual C++ Redistributable for VS 2015-2022 (ARM64)
@@ -83,6 +85,11 @@ try {
     if ($process.ExitCode -eq 0) {
         Write-Host "Visual Studio 2022 for C++ ARM64 development installed successfully!"
         Write-Host "Installation log: $logFile"
+    }
+    elseif ($process.ExitCode -eq 3010) {
+        Write-Warning "Visual Studio 2022 installation completed, but a reboot is required (exit code 3010)."
+        # You might want to prompt for a reboot or schedule one here
+        # Restart-Computer -Confirm -Force # Example: If you want to force a reboot    
     }
     else {
         Write-Error "Visual Studio 2022 installation failed with exit code $($process.ExitCode)."
@@ -187,10 +194,6 @@ if (-not $arm64CompilerFound) {
     # Install Visual Studio 2022
 
 }
-
-
-
-
 
 # --- CMake Check ---
 Write-Host "Checking for CMake..."
