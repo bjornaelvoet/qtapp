@@ -83,6 +83,8 @@ if (Test-Path $vsWherePath) {
     Write-Warning "This is common on systems where VS Build Tools are not installed in the default location."
 }
 
+# Define vsEdition upfront so it's always available
+$vsEdition = "Enterprise" # Options: Community, Professional, Enterprise
 if (-not $amd64CompilerFound) {
     Write-Error "=============================================================================="
     Write-Error "ERROR: Visual Studio 2022 AMD64 C++ Build Tools were not found."
@@ -91,7 +93,6 @@ if (-not $amd64CompilerFound) {
 
     # Install Visual Studio 2022
     # Define variable
-    $vsEdition = "Enterprise" # Options: Community, Professional, Enterprise
     $vsBootstrapperUrl = "https://aka.ms/vs/17/release/vs_${vsEdition}.exe"
     $downloadPath = "$env:TEMP\vs_bootstrapper.exe"
     $installPath = "C:\Program Files\Microsoft Visual Studio\2022\$vsEdition" # Customize install path
@@ -263,8 +264,6 @@ function Invoke-CmdScript {
 # Loading the visual studio build variables into our environment
 Write-Host "Loading Visual Studio Build Variables..."
 $vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\$vsEdition\VC\Auxiliary\Build\vcvarsall.bat"
-
-dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build"
 Invoke-CmdScript $vcvarsallBatPath amd64
 
 # Some helper paths to feed into cmake
