@@ -29,7 +29,7 @@ jobs:
     - name: Upload win amd64 Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: qtapp-win-arm64
+        name: qtapp-win-amd64
         # Build dir was given by the configure script
         path: ${{ env.BUILD_DIR_AMD64 }}/Release/*
 
