@@ -1,0 +1,59 @@
+name: Windows Release
+
+on:
+  push:
+    branches: [ "main","develop"]
+  pull_request:
+    branches: [ "main","develop" ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy-x64:
+
+    runs-on: windows-2025
+
+    env:
+      # Default build dir. Will be overwritten by the configure build scripts.
+      BUILD_DIR: "build"
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure and build for Windows target
+      shell: powershell
+      run: |
+        ./configure_build_win.ps1
+
+    - name: Upload win amd64 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qtapp-win-amd64
+        # Build dir was given by the configure script
+        path: ${{ env.BUILD_DIR_AMD64 }}/Release/*
+
+  build-and-deploy-arm64:
+
+    runs-on: windows-11-arm
+
+    env:
+      # Default build dir. Will be overwritten by the configure build scripts.
+      BUILD_DIR: "build"
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Configure and build for Windows target
+      shell: powershell
+      run: |
+        ./configure_build_winarm64.ps1
+
+    - name: Upload win arm64 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qtapp-win-arm64
+        # Build dir was given by the configure script
+        path: ${{ env.BUILD_DIR_ARM64 }}/Release/*
+        
