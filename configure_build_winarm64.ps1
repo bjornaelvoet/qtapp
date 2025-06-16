@@ -91,7 +91,7 @@ if (-not $arm64CompilerFound) {
 
     # Install Visual Studio 2022
     # Define variable
-    $vsEdition = "Community" # Options: Community, Professional, Enterprise
+    $vsEdition = "Enterprise" # Options: Community, Professional, Enterprise
     $vsBootstrapperUrl = "https://aka.ms/vs/17/release/vs_${vsEdition}.exe"
     $downloadPath = "$env:TEMP\vs_bootstrapper.exe"
     $installPath = "C:\Program Files\Microsoft Visual Studio\2022\$vsEdition" # Customize install path
