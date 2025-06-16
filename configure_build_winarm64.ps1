@@ -297,7 +297,7 @@ cmake --build "$buildDir" --config Release
 # We need the build path exposed to github workflow for artefact upload
 if ($env:CI -eq "true") {
     # Remove leading './' if present and append to GITHUB_ENV
-    $BuildDirWithoutDotSlash = $env:$buildDir -replace '^\./', ''
+    $BuildDirWithoutDotSlash = $buildDir -replace '^\./', ''
     echo "Debug: $BuildDirWithoutDotSlash"
     Add-Content -Path $env:GITHUB_ENV -Value "BUILD_DIR_ARM64=$BuildDirWithoutDotSlash"
 }
