@@ -226,10 +226,11 @@ $qtVersion = "6.9.1"
 $targetOsHost = "windows_arm64" # Explicitly specify the AMD64 host
 $targetPlatform = "desktop"      # The target platform/SDK
 $arch = "win64_msvc2022_arm64" # Confirmed exact architecture from aqt list-qt
+$archfolder = "msvc2022_arm64" # Name of the folder for the architecture
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
 # Check if dowload if needed
-$folderPath = "$outputDir\$qtVersion\$arch"
+$folderPath = "$outputDir\$qtVersion\$archfolder"
 if (Test-Path -Path $folderPath -PathType Container) {
     Write-Host "The folder '$folderPath' exists. No download needed."
 } else {
