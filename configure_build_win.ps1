@@ -87,7 +87,97 @@ if (-not $amd64CompilerFound) {
     Write-Error "=============================================================================="
     Write-Error "ERROR: Visual Studio 2022 AMD64 C++ Build Tools were not found."
     Write-Error "=============================================================================="
-    exit 1 # Exit if the necessary compiler is not found
+    #exit 1 # Exit if the necessary compiler is not found
+
+    # Install Visual Studio 2022
+    # Define variable
+    $vsEdition = "Community" # Options: Community, Professional, Enterprise
+    $vsBootstrapperUrl = "https://aka.ms/vs/17/release/vs_${vsEdition}.exe"
+    $downloadPath = "$env:TEMP\vs_bootstrapper.exe"
+    $installPath = "C:\Program Files\Microsoft Visual Studio\2022\$vsEdition" # Customize install path
+    $logFile = "$env:TEMP\vs_install_log.txt"
+
+    # Define the C++ workloads and components you want to install specifically for ARM64 development.
+    # Refer to https://learn.microsoft.com/en-us/visualstudio/install/workload-and-component-ids
+    # Ensure you are referencing the correct IDs for ARM64 components.
+
+    $workloads = @(
+        # TODO Check if we really need to install this???
+        #"Microsoft.VisualStudio.Workload.NativeDesktop" # Desktop development with C++
+        #"Microsoft.VisualStudio.Workload.NativeGame"    # Game development with C++ (consider if ARM64 gaming is relevant)
+        #"Microsoft.VisualStudio.Workload.NativeCrossPlat" # Linux and embedded development with C++
+    )
+
+    $components = @(
+        # Essential C++ Build Tools (VS 2022) for x86.x64
+        "Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+        # Windows SDKs
+        "Microsoft.VisualStudio.Component.Windows11SDK.26100"
+    )
+
+    # Convert workloads and components to command-line arguments
+    $addArguments = ""
+    foreach ($w in $workloads) {
+        $addArguments += "--add $w "
+    }
+    foreach ($c in $components) {
+        $addArguments += "--add $c "
+    }
+
+    # Construct the full argument list for the installer
+    # --quiet: completely silent
+    # --wait: waits for the installation to complete before the process exits
+    # --norestart: suppresses reboots (handle reboots separately if needed)
+    # --includeRecommended: installs recommended components for selected workloads
+    # --lang en-US: installs English language pack
+    $arguments = "--productId Microsoft.VisualStudio.Product.Community $addArguments --quiet --wait --norestart"
+
+    Write-Host "Starting Visual Studio 2022 unattended installation for C++ AMD64 development..."
+
+    # Check if running with administrator privileges
+    if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Write-Error "This script must be run with Administrator privileges. Please right-click and 'Run as Administrator'."
+        exit 1
+    }
+
+    # 1. Download the Visual Studio bootstrapper (the bootstrapper itself is usually x86 but orchestrates ARM64 downloads)
+    Write-Host "Downloading Visual Studio 2022 bootstrapper from $vsBootstrapperUrl to $downloadPath..."
+    try {
+        Invoke-WebRequest -Uri $vsBootstrapperUrl -OutFile $downloadPath -UseBasicParsing
+        Write-Host "Bootstrapper downloaded successfully."
+    }
+    catch {
+        Write-Error "Failed to download Visual Studio bootstrapper: $($_.Exception.Message)"
+        exit 1
+    }
+
+    # 2. Start the unattended installation
+    Write-Host "Starting Visual Studio installation in unattended mode..."
+    Write-Host "Command: ""$downloadPath"" $arguments"
+
+    try {
+        # Start the process and wait for it to complete
+        $process = Start-Process -FilePath $downloadPath -ArgumentList $arguments -NoNewWindow -PassThru -Wait
+
+        if ($process.ExitCode -eq 0) {
+            Write-Host "Visual Studio 2022 for C++ AMD64 development installed successfully!"
+            Write-Host "Installation log: $logFile"
+        }
+        elseif ($process.ExitCode -eq 3010) {
+            Write-Warning "Visual Studio 2022 installation completed, but a reboot is required (exit code 3010)."
+            # You might want to prompt for a reboot or schedule one here
+            # Restart-Computer -Confirm -Force # Example: If you want to force a reboot    
+        }
+        else {
+            Write-Error "Visual Studio 2022 installation failed with exit code $($process.ExitCode)."
+            Write-Error "Please check the log file for details: $logFile"
+            exit $process.ExitCode
+        }
+    }
+    catch {
+        Write-Error "An error occurred during Visual Studio installation: $($_.Exception.Message)"
+        exit 1
+    }
 }
 
 # --- CMake Check ---
@@ -125,30 +215,36 @@ $targetPlatform = "desktop"      # The target platform/SDK
 $arch = "win64_msvc2022_64" # Confirmed exact architecture from aqt list-qt
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
-Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
-Write-Host "Download location: $outputDir"
+# Check if dowload if needed
+$folderPath = "$outputDir\$qtVersion\$arch"
+if (Test-Path -Path $folderPath -PathType Container) {
+    Write-Host "The folder '$folderPath' exists. No download needed."
+} else {
+    Write-Host "The folder '$folderPath' does not exist."
+    Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
+    Write-Host "Download location: $outputDir"
 
-try {
-    # Create the output directory if it doesn't exist
-    if (-not (Test-Path $outputDir)) {
-        New-Item -ItemType Directory -Path $outputDir -Force
-        Write-Host "Created output directory: $outputDir"
+    try {
+        # Create the output directory if it doesn't exist
+        if (-not (Test-Path $outputDir)) {
+            New-Item -ItemType Directory -Path $outputDir -Force
+            Write-Host "Created output directory: $outputDir"
+        }
+
+        # Execute aqtinstall command with the correct subcommand and argument order:
+        # Order: aqt install-qt [options] <host> <target> <version> [arch]
+        aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
+        Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
     }
-
-    # Execute aqtinstall command with the correct subcommand and argument order:
-    # Order: aqt install-qt [options] <host> <target> <version> [arch]
-    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
-    Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
-}
-catch {
-    Write-Error "Failed to download Qt. Please check the Qt version, OS, and architecture, or your internet connection."
-    Write-Error "Ensure the specified '$qtVersion' and '$arch' are valid combinations for Qt $targetOsHost."
-    Write-Error "Error details: $($_.Exception.Message)"
-    exit 1
+    catch {
+        Write-Error "Failed to download Qt. Please check the Qt version, OS, and architecture, or your internet connection."
+        Write-Error "Ensure the specified '$qtVersion' and '$arch' are valid combinations for Qt $targetOsHost."
+        Write-Error "Error details: $($_.Exception.Message)"
+        exit 1
+    }
 }
 
 # Load the build environment
-
 # Invokes a Cmd.exe shell script and updates the environment.
 function Invoke-CmdScript {
   param(

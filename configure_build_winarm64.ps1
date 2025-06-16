@@ -90,7 +90,7 @@ if (-not $arm64CompilerFound) {
     #exit 1 # Exit if the necessary compiler is not found
 
     # Install Visual Studio 2022
-    # Define variables
+    # Define variable
     $vsEdition = "Community" # Options: Community, Professional, Enterprise
     $vsBootstrapperUrl = "https://aka.ms/vs/17/release/vs_${vsEdition}.exe"
     $downloadPath = "$env:TEMP\vs_bootstrapper.exe"
@@ -102,7 +102,7 @@ if (-not $arm64CompilerFound) {
     # Ensure you are referencing the correct IDs for ARM64 components.
 
     $workloads = @(
-        "Microsoft.VisualStudio.Workload.NativeDesktop" # Desktop development with C++
+        #"Microsoft.VisualStudio.Workload.NativeDesktop" # Desktop development with C++
         #"Microsoft.VisualStudio.Workload.NativeGame"    # Game development with C++ (consider if ARM64 gaming is relevant)
         #"Microsoft.VisualStudio.Workload.NativeCrossPlat" # Linux and embedded development with C++
     )
@@ -190,8 +190,6 @@ if (-not $arm64CompilerFound) {
         Write-Error "An error occurred during Visual Studio installation: $($_.Exception.Message)"
         exit 1
     }
-
-
 }
 
 # --- CMake Check ---
@@ -229,30 +227,36 @@ $targetPlatform = "desktop"      # The target platform/SDK
 $arch = "win64_msvc2022_arm64" # Confirmed exact architecture from aqt list-qt
 $outputDir = "$PSScriptRoot\Qt" # Downloads Qt to a 'Qt' folder next to the script
 
-Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
-Write-Host "Download location: $outputDir"
+# Check if dowload if needed
+$folderPath = "$outputDir\$qtVersion\$arch"
+if (Test-Path -Path $folderPath -PathType Container) {
+    Write-Host "The folder '$folderPath' exists. No download needed."
+} else {
+    Write-Host "The folder '$folderPath' does not exist."
+    Write-Host "Attempting to download Qt version $qtVersion for $targetOsHost ($arch)..."
+    Write-Host "Download location: $outputDir"
 
-try {
-    # Create the output directory if it doesn't exist
-    if (-not (Test-Path $outputDir)) {
-        New-Item -ItemType Directory -Path $outputDir -Force
-        Write-Host "Created output directory: $outputDir"
+    try {
+        # Create the output directory if it doesn't exist
+        if (-not (Test-Path $outputDir)) {
+            New-Item -ItemType Directory -Path $outputDir -Force
+            Write-Host "Created output directory: $outputDir"
+        }
+
+        # Execute aqtinstall command with the correct subcommand and argument order:
+        # Order: aqt install-qt [options] <host> <target> <version> [arch]
+        aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
+        Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
     }
-
-    # Execute aqtinstall command with the correct subcommand and argument order:
-    # Order: aqt install-qt [options] <host> <target> <version> [arch]
-    aqt install-qt --outputdir $outputDir $targetOsHost $targetPlatform $qtVersion $arch
-    Write-Host "Qt $qtVersion for $targetOsHost ($arch) downloaded successfully to $outputDir."
-}
-catch {
-    Write-Error "Failed to download Qt. Please check the Qt version, OS, and architecture, or your internet connection."
-    Write-Error "Ensure the specified '$qtVersion' and '$arch' are valid combinations for Qt $targetOsHost."
-    Write-Error "Error details: $($_.Exception.Message)"
-    exit 1
+    catch {
+        Write-Error "Failed to download Qt. Please check the Qt version, OS, and architecture, or your internet connection."
+        Write-Error "Ensure the specified '$qtVersion' and '$arch' are valid combinations for Qt $targetOsHost."
+        Write-Error "Error details: $($_.Exception.Message)"
+        exit 1
+    }
 }
 
 # Load the build environment
-
 # Invokes a Cmd.exe shell script and updates the environment.
 function Invoke-CmdScript {
   param(
