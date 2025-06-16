@@ -130,7 +130,7 @@ if (-not $amd64CompilerFound) {
     # --norestart: suppresses reboots (handle reboots separately if needed)
     # --includeRecommended: installs recommended components for selected workloads
     # --lang en-US: installs English language pack
-    $arguments = "--productId Microsoft.VisualStudio.Product.Community $addArguments --quiet --wait --norestart"
+    $arguments = "--productId Microsoft.VisualStudio.Product.Enterprise $addArguments --quiet --wait --norestart"
 
     Write-Host "Starting Visual Studio 2022 unattended installation for C++ AMD64 development..."
 
@@ -267,13 +267,16 @@ Invoke-CmdScript $vcvarsallBatPath amd64
 
 # Some helper paths to feed into cmake
 $buildDir = "./build_amd64"
-$Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\msvc2022_64" 
+$Qt6_dir = "$PSScriptRoot\Qt\$qtVersion\$archfolder" 
 $toolchainFilePath = "$Qt6_dir\lib\cmake\Qt6\qt.toolchain.cmake"
 
 # Building the x64 version
 Write-Host "Building x64 version..."
 cmake -S . -B "$buildDir" -DCMAKE_PREFIX_PATH="$Qt6_Dir" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath"
 cmake --build "$buildDir" --config Release
+
+# Fix copy missing qwindows.dll as windeployqt missing it
+cp "$Qt6_dir\plugins\platforms\qwindows.dll" "$$buildDir\Release\qwindows.dll"
 
 # Bundling application
 & "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=. --release "$BuildDir\Release\QtApp.exe"
