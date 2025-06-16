@@ -264,7 +264,7 @@ function Invoke-CmdScript {
 Write-Host "Loading Visual Studio Build Variables..."
 $vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\$vsEdition\VC\Auxiliary\Build\vcvarsall.bat"
 
-C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build
+dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build"
 Invoke-CmdScript $vcvarsallBatPath amd64
 
 # Some helper paths to feed into cmake
