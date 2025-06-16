@@ -263,6 +263,8 @@ function Invoke-CmdScript {
 # Loading the visual studio build variables into our environment
 Write-Host "Loading Visual Studio Build Variables..."
 $vcvarsallBatPath = "C:\Program Files\Microsoft Visual Studio\2022\$vsEdition\VC\Auxiliary\Build\vcvarsall.bat"
+
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build
 Invoke-CmdScript $vcvarsallBatPath amd64
 
 # Some helper paths to feed into cmake
@@ -276,7 +278,7 @@ cmake -S . -B "$buildDir" -DCMAKE_PREFIX_PATH="$Qt6_Dir" -DCMAKE_BUILD_TYPE=Rele
 cmake --build "$buildDir" --config Release
 
 # Fix copy missing qwindows.dll as windeployqt missing it
-cp "$Qt6_dir\plugins\platforms\qwindows.dll" "$$buildDir\Release\qwindows.dll"
+cp "$Qt6_dir\plugins\platforms\qwindows.dll" "$buildDir\Release\qwindows.dll"
 
 # Bundling application
 & "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=. --release "$BuildDir\Release\QtApp.exe"
