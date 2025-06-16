@@ -26,6 +26,13 @@ jobs:
       run: |
         ./configure_build_win.ps1
 
+    - name: Upload win amd64 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qtapp-win-arm64
+        # Build dir was given by the configure script
+        path: ${{ env.BUILD_DIR_AMD64 }}/Release/*
+
   build-and-deploy-arm64:
 
     runs-on: windows-11-arm
@@ -42,4 +49,11 @@ jobs:
       shell: powershell
       run: |
         ./configure_build_winarm64.ps1
+
+    - name: Upload win arm64 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qtapp-win-arm64
+        # Build dir was given by the configure script
+        path: ${{ env.BUILD_DIR_ARM64 }}/Release/*
         
