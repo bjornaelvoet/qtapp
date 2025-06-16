@@ -287,10 +287,6 @@ Write-Host "Building arm64 version..."
 cmake -S . -B "$buildDir" -DCMAKE_PREFIX_PATH="$Qt6_Dir" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$toolchainFilePath"
 cmake --build "$buildDir" --config Release
 
-# Bundling application
-& "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=. --release "$BuildDir\Release\QtApp.exe"
-cmake --build "$buildDir" --config Release
-
 # Bundling arm64 application
 & "$(Join-Path $Qt6_dir 'bin\windeployqt')" --qmldir=. --release "$BuildDir\Release\QtApp.exe"
 
